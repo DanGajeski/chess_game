@@ -27,6 +27,11 @@ class Piece():
 		self.cur_space_vec = u.Vec2(self.col, self.row)
 		self.team = team
 		self.type = ''
+
+		self.possible_moves_open = []
+		self.possible_moves_enemy = []
+		self.impossible_moves_team = []
+		self.impossible_moves_boundary = []
 		#self.board_location = 0
 		#self.health = 1
 
