@@ -232,11 +232,20 @@ class Pawn(Piece):
 						if potential_spaces[x].team != self.team:
 							self.possible_moves_enemy.append(cur_move)					
 
+			# if action_taken == False:
+			# 	self.impossible_moves_boundary.append(cur_move)
+
+
+	#RECHECK
 	def determine_possible_moves(self, potential_spaces):
 
 		self.determine_possible_moves_straight_pawn(potential_spaces)
 		self.check_space_pawn(potential_spaces, (self.cur_space_vec + move_down + move_left * self.direction))
 		self.check_space_pawn(potential_spaces, (self.cur_space_vec + move_down + move_right * self.direction))
+
+
+
+
 
 
 
@@ -280,6 +289,16 @@ class Rook(Piece):
 		#self.type = 'R'
 		self.move_type = "glider"
 
+	# def determine_possible_moves(self):
+		
+	# 	rook_cur_space = u.Vec2(self.col, self.row)
+
+	# 	for n in range(0, 7):
+	# 		self.possible_moves_down.append(rook_cur_space + move_down * (n+1))
+	# 		self.possible_moves_up.append(rook_cur_space + move_up * (n+1))
+	# 		self.possible_moves_right.append(rook_cur_space + move_right * (n+1))
+	# 		self.possible_moves_left.append(rook_cur_space + move_left * (n+1))
+
 	def determine_possible_moves(self, potential_spaces):
 		#move_up, move_down, move_left, move_right
 		self.determine_possible_moves_direction(potential_spaces, move_up)
@@ -292,6 +311,20 @@ class Bishop(Piece):
 		super().__init__(col, row, team)
 		#self.type = 'B'
 		self.move_type = "glider"
+		# self.possible_moves_up_right = []
+		# self.possible_moves_down_right = []
+		# self.possible_moves_down_left = []
+		# self.possible_moves_up_left = []
+
+	# def determine_possible_moves(self):
+
+	# 	bishop_cur_space = u.Vec2(self.col, self.row)
+		
+	# 	for n in range(0,7):
+	# 		self.possible_moves_up_right.append(bishop_cur_space + (move_up + move_right) * (n + 1))
+	# 		self.possible_moves_down_right.append(bishop_cur_space + (move_down + move_right) * (n + 1))
+	# 		self.possible_moves_down_left.append(bishop_cur_space + (move_down + move_left) * (n + 1))
+	# 		self.possible_moves_up_left.append(bishop_cur_space + (move_up + move_left) * (n + 1))
 
 	def determine_possible_moves(self, potential_spaces):
 
@@ -300,11 +333,33 @@ class Bishop(Piece):
 		self.determine_possible_moves_direction(potential_spaces, (move_down + move_left))
 		self.determine_possible_moves_direction(potential_spaces, (move_up + move_left))
 
+
 class Queen(Piece):
 	def __init__(self, col, row, team):
 		super().__init__(col, row, team)
 		#self.type = 'Q'
 		self.move_type = "glider"
+		# self.possible_moves_up = []
+		# self.possible_moves_down = []
+		# self.possible_moves_left = []
+		# self.possible_moves_right = []
+		# self.possible_moves_up_right = []
+		# self.possible_moves_up_left = []
+		# self.possible_moves_down_right = []
+		# self.possible_moves_down_left = []
+
+	# def determine_possible_moves(self):
+	# 	queen_cur_space = u.Vec2(self.col, self.row)
+
+	# 	for n in range(0, 7):
+	# 		self.possible_moves_up.append(queen_cur_space + move_up * (n + 1))
+	# 		self.possible_moves_down.append(queen_cur_space + move_down * (n + 1))
+	# 		self.possible_moves_left.append(queen_cur_space + move_left * (n + 1))
+	# 		self.possible_moves_right.append(queen_cur_space + move_right * (n + 1))
+	# 		self.possible_moves_up_right.append(queen_cur_space + (move_up + move_right) * (n + 1))
+	# 		self.possible_moves_up_left.append(queen_cur_space + (move_up + move_left) * (n + 1))
+	# 		self.possible_moves_down_right.append(queen_cur_space + (move_down + move_right) * (n + 1))
+	# 		self.possible_moves_down_left.append(queen_cur_space + (move_down + move_left) * (n + 1))
 
 	def determine_possible_moves(self, potential_spaces):
 
@@ -317,11 +372,27 @@ class Queen(Piece):
 		self.determine_possible_moves_direction(potential_spaces, (move_down + move_left))
 		self.determine_possible_moves_direction(potential_spaces, (move_up + move_left))
 
+
 class Knight(Piece):
 	def __init__(self, col, row, team):
 		super().__init__(col, row, team)
 		#self.type = 'T'
 		self.move_type = "hopper"
+		#self.possible_moves = []#Vec2() objects
+
+	# def determine_possible_moves(self):
+	# 	knight_cur_space = u.Vec2(self.col, self.row)
+
+	# 	#UP-RIGHT-CLOCKWISE>
+
+	# 	self.possible_moves.append(knight_cur_space + move_right + move_up * 2)
+	# 	self.possible_moves.append(knight_cur_space + move_right * 2 + move_up)
+	# 	self.possible_moves.append(knight_cur_space + move_right * 2 + move_down)
+	# 	self.possible_moves.append(knight_cur_space + move_right + move_down * 2)
+	# 	self.possible_moves.append(knight_cur_space + move_left + move_down * 2)
+	# 	self.possible_moves.append(knight_cur_space + move_left * 2 + move_down)
+	# 	self.possible_moves.append(knight_cur_space + move_left * 2 + move_up)
+	# 	self.possible_moves.append(knight_cur_space + move_left + move_up * 2)
 
 	def determine_possible_moves(self, potential_spaces, cur_move):
 		#cur_move = self.cur_space_vec
@@ -340,8 +411,26 @@ class King(Piece):
 		super().__init__(col, row, team)
 		#self.type = 'K'
 		self.move_type = "hopper"
+		# self.possible_moves = []#Vec2() objects
+
+	# def determine_possible_moves(self):
+	# 	king_cur_space = u.Vec2(self.col, self.row)
+
+	# 	#UP-RIGHT-CLOCKWISE>
+
+	# 	self.possible_moves.append(king_cur_space + move_up)
+	# 	self.possible_moves.append(king_cur_space + move_up + move_right)
+	# 	self.possible_moves.append(king_cur_space + move_right)
+	# 	self.possible_moves.append(king_cur_space + move_down + move_right)
+	# 	self.possible_moves.append(king_cur_space + move_down)
+	# 	self.possible_moves.append(king_cur_space + move_down + move_left)
+	# 	self.possible_moves.append(king_cur_space + move_left)
+	# 	self.possible_moves.append(king_cur_space + move_up + move_left)
+
+	#check_space(self, potential_spaces, cur_move):
 
 	def determine_possible_moves(self, potential_spaces, cur_move):
+		#cur_move = self.cur_space_vec
 		self.check_space(potential_spaces, (self.cur_space_vec + move_up))
 		self.check_space(potential_spaces, (self.cur_space_vec + move_up + move_right))
 		self.check_space(potential_spaces, (self.cur_space_vec + move_right))
