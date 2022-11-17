@@ -47,10 +47,79 @@ class Piece():
 		#else:
 		#	return str(self.col) + "," + str(self.row) + "," + str(self.cur_space) + "," + str(self.team)
 
+	def reset_possible_moves_attributes(self):
+		self.possible_moves_open = []
+		self.possible_moves_enemy = []
+		self.impossible_moves_team = []
+		self.impossible_moves_boundary = []
+
 	def set_location(self, new_col, new_row):
 		self.row = new_row
 		self.col = new_col
 		self.cur_space = (self.col, self.row)
+
+	def determine_possible_moves_direction(self, potential_spaces, direction):
+		#move_down, move_up, move_left, move_right
+
+		first_index_found = False
+
+		for n in range(0, 7):
+			cur_move = self.cur_space_vec + direction * (n + 1)
+
+			#action_taken = False
+			if first_index_found == False:
+				for x in range(len(potential_spaces)):
+
+					action_taken = False
+					if cur_move.xy == potential_spaces[x].xy:
+
+						if potential_spaces[x].open == False:
+
+							if potential_spaces[x].team == self.team:
+								self.impossible_moves_team.append(cur_move) 
+								first_index_found = True
+								action_taken = True
+								break
+							else:
+								self.possible_moves_enemy.append(cur_move)
+								first_index_found = True
+								action_taken = True
+								break
+
+						else:
+							self.possible_moves_open.append(cur_move)
+							action_taken = True
+							break
+					
+				if action_taken == False:
+					self.impossible_moves_boundary.append(cur_move)
+					first_index_found = True
+
+	def check_space(self, potential_spaces, cur_move): #cur_move is target_vector 
+		
+		for x in range(len(potential_spaces)):
+
+			action_taken = False
+			if cur_move.xy == potential_spaces[x].xy:
+
+				if potential_spaces[x].open == False:
+
+					if potential_spaces[x].team == self.team: 
+						self.impossible_moves_team.append(cur_move) 
+						action_taken = True
+						break
+					else:
+						self.possible_moves_enemy.append(cur_move)
+						action_taken = True
+						break
+
+				else:
+					self.possible_moves_open.append(cur_move)
+					action_taken = True
+					break
+			
+		if action_taken == False:
+			self.impossible_moves_boundary.append(cur_move)
 
 class Pawn(Piece):
 	def __init__(self, col:int, row:int, team:str) -> None:
@@ -58,9 +127,15 @@ class Pawn(Piece):
 		#self.type = 'P'
 		self.move_type = "hopper"
 		self.init_move = True
-		#self.possible_moves = [] #contains vector objects
-		self.possible_moves_straight = [] #one or two straight moves, Vec2 objects
-		self.possible_moves_attack = [] #two diag moves, Vec2 objects
+
+		#self.possible_moves_straight = [] #one or two straight moves, Vec2 objects
+
+		# self.possible_moves_open = []  #straight moves
+		# self.possible_moves_enemy = []  #diag attack moves
+		self.impossible_moves_enemy = []
+		# self.impossible_moves_team = []  #straight moves blocked by team-piece
+		# self.impossible_moves_boundary = []  #straight moves blocked by boundary
+
 		#self.possible_en_pessant_move = []
 
 		if self.team == "blue":
@@ -78,18 +153,130 @@ class Pawn(Piece):
 	#def TRANSMUTE_PAWN_INTO_ANY_OTHER_PIECETYPE_NOT_INCLUDING_KING()
 	#IF current pawn piece moves to enemy starting row, ((0,n)OR(7,n))[piece.direction...?]: PAWN can CHANGE into ANY other piece kind(noKING)
 
+	
+	#######BREAKINGHERE######11-16
+	def determine_possible_moves_straight_pawn(self, potential_spaces):
+		#move_down, move_up, move_left, move_right
+
+		if  self.init_move == True:  #check multiple spaces in a row
+			first_index_found = False
+
+			for n in range(0, 2):
+				cur_move = self.cur_space_vec + move_down * self.direction * (n + 1)
+
+				if first_index_found == False:
+					for x in range(len(potential_spaces)):
+
+						action_taken = False
+						if cur_move.xy == potential_spaces[x].xy:
+
+							if potential_spaces[x].open == False:
+
+								if potential_spaces[x].team == self.team:
+									self.impossible_moves_team.append(cur_move) 
+									first_index_found = True
+									action_taken = True
+									break
+								else:
+									self.impossible_moves_enemy.append(cur_move)
+									first_index_found = True
+									action_taken = True
+									break
+
+							else:
+								self.possible_moves_open.append(cur_move)
+								action_taken = True
+								break
+						
+					if action_taken == False:
+						self.impossible_moves_boundary.append(cur_move)
+						first_index_found = True
+
+		else:	#check one space in front
+			cur_move = self.cur_space_vec + move_down * self.direction * 2
+
+			for x in range(len(potential_spaces)):
+
+				action_taken = False
+				if cur_move.xy == potential_spaces[x].xy:
+
+					if potential_spaces[x].open == False:
+
+						if potential_spaces[x].team == self.team:
+							self.impossible_moves_team.append(cur_move)
+							first_index_found = True  
+							action_taken = True 
+							break
+						else:
+							self.impossible_moves_enemy.append(cur_move)
+							first_index_found = True 
+							action_taken = True 
+							break
+					else:
+						self.possible_moves_open.append(cur_move)
+						action_taken = True 
+						break
+
+			if action_taken == False:
+				self.impossible_moves_boundary.append(cur_move)
+
+	def check_space_pawn(self, potential_spaces, cur_move): #cur_move is target_vector, checks one space diag to attack
+		
+			for x in range(len(potential_spaces)):
+
+				action_taken = False
+				if cur_move.xy == potential_spaces[x].xy:
+
+					if potential_spaces[x].open == False:
+
+						if potential_spaces[x].team != self.team:
+							self.possible_moves_enemy.append(cur_move)					
+
+			# if action_taken == False:
+			# 	self.impossible_moves_boundary.append(cur_move)
+
+
 	#RECHECK
-	def determine_possible_moves(self):
+	def determine_possible_moves(self, potential_spaces):
+
+		self.determine_possible_moves_straight_pawn(potential_spaces)
+		self.check_space_pawn(potential_spaces, (self.cur_space_vec + move_down + move_left * self.direction))
+		self.check_space_pawn(potential_spaces, (self.cur_space_vec + move_down + move_right * self.direction))
+
+
+
+
+
+
+
+
+		#1. check first move straight 
+		#2. check second move straight  
+		#3. check attack move right  
+		#4. check attack move left 
+
+		#first two changed? 
+		
+
+		# ###
+		# self.check_space_pawn(potential_spaces, self.cur_space_vec + move_down * self.direction)
+		# if self.init_move == True:
+		# 	self.check_space_pawn(potential_spaces, self.cur_space_vec + (move_down * 2) * self.direction)
+		# self.check_space_pawn(potential_spaces, self.cur_space_vec + move_down * self.direction + move_right)
+		# self.check_space_pawn(potential_spaces, self.cur_space_vec + move_down * self.direction + move_left)
+		# ###
+		
+
 
 		#move_down gets converted to up or down depending on pawn team/direction
-		pawn_cur_space = u.Vec2(self.col, self.row)
+		#pawn_cur_space = u.Vec2(self.col, self.row)
 
-		self.possible_moves_straight.append((pawn_cur_space + move_down * self.direction))
-		if self.init_move == True:
-			self.possible_moves_straight.append((pawn_cur_space + (move_down * 2) * self.direction))
+		#self.possible_moves_straight.append((pawn_cur_space + move_down * self.direction))
+		#if self.init_move == True:
+		#	self.possible_moves_straight.append((pawn_cur_space + (move_down * 2) * self.direction))
 		
-		self.possible_moves_attack.append((pawn_cur_space + move_down * self.direction + move_right))
-		self.possible_moves_attack.append((pawn_cur_space + move_down * self.direction + move_left))
+		#self.possible_moves_attack.append((pawn_cur_space + move_down * self.direction + move_right))
+		#self.possible_moves_attack.append((pawn_cur_space + move_down * self.direction + move_left))
 
 	#enPESSANT
 	#IF in turn previous...OTHERCOLOR PAWN MOVES FROM cols Pos and Neg in relate
@@ -101,37 +288,6 @@ class Rook(Piece):
 		super().__init__(col, row, team)
 		#self.type = 'R'
 		self.move_type = "glider"
-		self.possible_moves_down = []
-		self.possible_moves_up = []
-		self.possible_moves_right = []
-		self.possible_moves_left = []
-
-		self.possible_moves_down_real = []
-		self.possible_moves_up_real = []
-		self.possible_moves_right_real = []
-		self.possible_moves_left_real = []
-
-		#testatts
-		self.possible_moves_down_right_real = []
-		self.possible_moves_down_left_real = []
-		self.possible_moves_up_right_real = []
-		self.possible_moves_up_left_real = []
-
-
-
-		#yagni youaintgonnaneedit - avoid data duplication
-		self.possible_moves_open = []
-		self.possible_moves_enemy = []
-		self.impossible_moves_ally = []
-		self.impossible_moves_boundary = []
-		#condense to just self.possible_moves.   As printing out possible moves... extra specification doesn't matter
-
-		self.impossible_moves_boundary = []
-		self.impossible_moves_team = [] # Vec2 Objects
-		self.possible_moves_enemy = []
-		#self.out_of_bounds = []#?
-
-		#self.cur_space = u.Vec2(self.col, self.row)
 
 	def determine_possible_moves(self):
 		
@@ -143,345 +299,7 @@ class Rook(Piece):
 			self.possible_moves_right.append(rook_cur_space + move_right * (n+1))
 			self.possible_moves_left.append(rook_cur_space + move_left * (n+1))
 
-	def determine_possible_moves_real(self, potential_spaces):
-		rook_cur_space = u.Vec2(self.col, self.row)
-		#cur_move = ''
-		
-		#potential_spaces list brought in - list full of u.Space objects
 
-		#block = False  
-
-		#while block == False:
-
-			# for n in range(0, 7):
-			# 	cur_move = rook_cur_space + move_down * (n+1)
-			# 	for x in range(len(potential_spaces)):
-			# 		if cur_move.xy 
-	
-		#first_index_found = False
-		#action_taken = False 
-		
-		def determine_possible_moves_down():
-			first_index_found = False
-			#action_taken = False
-
-			for n in range(0, 7):
-				#action_taken = False
-				cur_move = rook_cur_space + move_down * (n+1)
-
-				if first_index_found == False:
-					for x in range(len(potential_spaces)):
-
-						action_taken = False
-						if cur_move.xy == potential_spaces[x].xy:
-
-							if potential_spaces[x].open == False:
-
-								if potential_spaces[x].team == self.team: #notsameteam
-									self.impossible_moves_team.append(cur_move) 
-									first_index_found = True
-									action_taken = True
-									break
-								else:
-									self.possible_moves_down_real.append(cur_move)
-									self.possible_moves_enemy.append(cur_move)
-									first_index_found = True
-									action_taken = True
-									break
-
-							else:
-								self.possible_moves_down_real.append(cur_move)
-								action_taken = True
-								break
-						
-					if action_taken == False:
-						self.impossible_moves_boundary.append(cur_move)
-						first_index_found = True
-
-		def determine_possible_moves_up():
-			first_index_found = False
-			#action_taken = False
-
-			for n in range(0, 7):
-				#action_taken = False
-				cur_move = rook_cur_space + move_up * (n+1)
-
-				if first_index_found == False:
-					for x in range(len(potential_spaces)):
-
-						action_taken = False
-						if cur_move.xy == potential_spaces[x].xy:
-
-							#print(action_taken)
-							if potential_spaces[x].open == False:
-
-								#print(action_taken)
-								if potential_spaces[x].team == self.team: #notsameteam
-									self.impossible_moves_team.append(cur_move) 
-									first_index_found = True
-									action_taken = True
-									#print('A')
-									break
-								else:
-									self.possible_moves_up_real.append(cur_move)
-									self.possible_moves_enemy.append(cur_move)
-									first_index_found = True
-									action_taken = True
-									#print('B')
-									break
-
-							#print(action_taken)
-							else:
-								self.possible_moves_up_real.append(cur_move)
-								action_taken = True
-								#print('C')
-								break
-						#else:
-							#pass
-					#print(action_taken)
-					if action_taken == False:
-						self.impossible_moves_boundary.append(cur_move)
-						first_index_found = True
-
-		def determine_possible_moves_right():
-			first_index_found = False
-			#action_taken = False
-
-			for n in range(0, 7):
-				#action_taken = False
-				cur_move = rook_cur_space + move_right * (n+1)
-
-				if first_index_found == False:
-					for x in range(len(potential_spaces)):
-
-						action_taken = False
-						if cur_move.xy == potential_spaces[x].xy:
-
-							if potential_spaces[x].open == False:
-
-								if potential_spaces[x].team == self.team: #notsameteam
-									self.impossible_moves_team.append(cur_move) 
-									first_index_found = True
-									action_taken = True
-									break
-								else:
-									self.possible_moves_right_real.append(cur_move)
-									self.possible_moves_enemy.append(cur_move)
-									first_index_found = True
-									action_taken = True
-									break
-
-							else:
-								self.possible_moves_right_real.append(cur_move)
-								action_taken = True
-								break
-						
-					if action_taken == False:
-						self.impossible_moves_boundary.append(cur_move)
-						first_index_found = True
-
-		def determine_possible_moves_left():
-			first_index_found = False
-			#action_taken = False
-
-			for n in range(0, 7):
-				#action_taken = False
-				cur_move = rook_cur_space + move_left * (n+1)
-
-				if first_index_found == False:
-					for x in range(len(potential_spaces)):
-
-						action_taken = False
-						if cur_move.xy == potential_spaces[x].xy:
-
-							if potential_spaces[x].open == False:
-
-								if potential_spaces[x].team == self.team: #notsameteam
-									self.impossible_moves_team.append(cur_move) 
-									first_index_found = True
-									action_taken = True
-									break
-								else:
-									self.possible_moves_left_real.append(cur_move)
-									self.possible_moves_enemy.append(cur_move)
-									first_index_found = True
-									action_taken = True
-									break
-
-							else:
-								self.possible_moves_left_real.append(cur_move)
-								action_taken = True
-								break
-						
-					if action_taken == False:
-						self.impossible_moves_boundary.append(cur_move)
-						first_index_found = True
-
-		# determine_possible_moves_up()
-		# determine_possible_moves_down()
-		# determine_possible_moves_left()
-		# determine_possible_moves_right()
-
-
-		#######WORKSPACE###############TEMP#####################################################################################################
-
-		def determine_possible_moves_up_right():
-			first_index_found = False
-			#action_taken = False
-
-			for n in range(0, 7):
-				#action_taken = False
-				cur_move = rook_cur_space + (move_up + move_right) * (n + 1)
-
-				if first_index_found == False:
-					for x in range(len(potential_spaces)):
-
-						action_taken = False
-						if cur_move.xy == potential_spaces[x].xy:
-
-							if potential_spaces[x].open == False:
-
-								if potential_spaces[x].team == self.team: #notsameteam
-									self.impossible_moves_team.append(cur_move) 
-									first_index_found = True
-									action_taken = True
-									break
-								else:
-									self.possible_moves_up_right_real.append(cur_move)
-									self.possible_moves_enemy.append(cur_move)
-									first_index_found = True
-									action_taken = True
-									break
-
-							else:
-								self.possible_moves_up_right_real.append(cur_move)
-								action_taken = True
-								break
-						
-					if action_taken == False:
-						self.impossible_moves_boundary.append(cur_move)
-						first_index_found = True
-
-		def determine_possible_moves_down_right():
-			first_index_found = False
-			#action_taken = False
-
-			for n in range(0, 7):
-				#action_taken = False
-				cur_move = rook_cur_space + (move_down + move_right) * (n + 1)
-
-				if first_index_found == False:
-					for x in range(len(potential_spaces)):
-
-						action_taken = False
-						if cur_move.xy == potential_spaces[x].xy:
-
-							if potential_spaces[x].open == False:
-
-								if potential_spaces[x].team == self.team: #notsameteam
-									self.impossible_moves_team.append(cur_move) 
-									first_index_found = True
-									action_taken = True
-									break
-								else:
-									self.possible_moves_down_right_real.append(cur_move)
-									self.possible_moves_enemy.append(cur_move)
-									first_index_found = True
-									action_taken = True
-									break
-
-							else:
-								self.possible_moves_down_right_real.append(cur_move)
-								action_taken = True
-								break
-						
-					if action_taken == False:
-						self.impossible_moves_boundary.append(cur_move)
-						first_index_found = True
-
-		def determine_possible_moves_down_left():
-			first_index_found = False
-			#action_taken = False
-
-			for n in range(0, 7):
-				#action_taken = False
-				cur_move = rook_cur_space + (move_down + move_left) * (n + 1)  ####CHANGE
-
-				if first_index_found == False:
-					for x in range(len(potential_spaces)):
-
-						action_taken = False
-						if cur_move.xy == potential_spaces[x].xy:
-
-							if potential_spaces[x].open == False:
-
-								if potential_spaces[x].team == self.team: 
-									self.impossible_moves_team.append(cur_move) 
-									first_index_found = True
-									action_taken = True
-									break
-								else:
-									self.possible_moves_down_left_real.append(cur_move)  ####CHANGE
-									self.possible_moves_enemy.append(cur_move)
-									first_index_found = True
-									action_taken = True
-									break
-
-							else:
-								self.possible_moves_down_left_real.append(cur_move)  ####CHANGE
-								action_taken = True
-								break
-						
-					if action_taken == False:
-						self.impossible_moves_boundary.append(cur_move)
-						first_index_found = True
-
-		def determine_possible_moves_up_left():
-			first_index_found = False
-			#action_taken = False
-
-			for n in range(0, 7):
-				#action_taken = False
-				cur_move = rook_cur_space + (move_up + move_left) * (n + 1)  ####CHANGE  #ALSOCUR_CUR_SPACE CHANGES
-
-				if first_index_found == False:
-					for x in range(len(potential_spaces)):
-
-						action_taken = False
-						if cur_move.xy == potential_spaces[x].xy:
-
-							if potential_spaces[x].open == False:
-
-								if potential_spaces[x].team == self.team: 
-									self.impossible_moves_team.append(cur_move) 
-									first_index_found = True
-									action_taken = True
-									break
-								else:
-									self.possible_moves_up_left_real.append(cur_move)  ####CHANGE
-									self.possible_moves_enemy.append(cur_move)
-									first_index_found = True
-									action_taken = True
-									break
-
-							else:
-								self.possible_moves_up_left_real.append(cur_move)  ####CHANGE
-								action_taken = True
-								break
-						
-					if action_taken == False:
-						self.impossible_moves_boundary.append(cur_move)
-						first_index_found = True
-
-
-		determine_possible_moves_up()
-		determine_possible_moves_down()
-		determine_possible_moves_left()
-		determine_possible_moves_right()
-		determine_possible_moves_up_right()
-		determine_possible_moves_up_left()
-		determine_possible_moves_down_right()
-		determine_possible_moves_down_left()
 
 
 

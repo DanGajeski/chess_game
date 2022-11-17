@@ -29,6 +29,11 @@ class Vec2():
 		#return f"hello {self.x}"
 		#return "Hello %s!" % self.x
 
+	def __eq__(self, other_vec:Vec2) -> Bool:
+		if self.x == other_vec.x and self.y == other_vec.y:
+			return True
+		# return True if self.x == other_vec.x and if self.y == other_vec.y
+
 	#def give_position(self) -> tuple:
 	#	return (self.x, self.y) 
 
