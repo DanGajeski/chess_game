@@ -19,7 +19,7 @@ move_left = u.Vec2(-1,0)
 #useparentatts, not necessarily all methods
 class Piece():
 
-	def __init__(self, col, row, team):
+	def __init__(self, col, row, team) -> None:
 		self.row = row
 		self.col = col
 		self.cur_space = (self.col, self.row)
@@ -30,7 +30,7 @@ class Piece():
 
 		self.possible_moves_open = []
 		self.possible_moves_enemy = []
-		self.impossible_moves_team = []
+		self.impossible_moves_blocked = []
 		self.impossible_moves_boundary = []
 		#self.board_location = 0
 		#self.health = 1
@@ -50,7 +50,7 @@ class Piece():
 	def reset_possible_moves_attributes(self):
 		self.possible_moves_open = []
 		self.possible_moves_enemy = []
-		self.impossible_moves_team = []
+		self.impossible_moves_blocked = []
 		self.impossible_moves_boundary = []
 
 	def set_location(self, new_col, new_row):
@@ -76,7 +76,7 @@ class Piece():
 						if potential_spaces[x].open == False:
 
 							if potential_spaces[x].team == self.team:
-								self.impossible_moves_team.append(cur_move) 
+								self.impossible_moves_blocked.append(cur_move) 
 								first_index_found = True
 								action_taken = True
 								break
@@ -105,7 +105,7 @@ class Piece():
 				if potential_spaces[x].open == False:
 
 					if potential_spaces[x].team == self.team: 
-						self.impossible_moves_team.append(cur_move) 
+						self.impossible_moves_blocked.append(cur_move) 
 						action_taken = True
 						break
 					else:
@@ -128,14 +128,6 @@ class Pawn(Piece):
 		self.move_type = "hopper"
 		self.init_move = True
 
-		#self.possible_moves_straight = [] #one or two straight moves, Vec2 objects
-
-		# self.possible_moves_open = []  #straight moves
-		# self.possible_moves_enemy = []  #diag attack moves
-		self.impossible_moves_enemy = []
-		# self.impossible_moves_team = []  #straight moves blocked by team-piece
-		# self.impossible_moves_boundary = []  #straight moves blocked by boundary
-
 		#self.possible_en_pessant_move = []
 
 		if self.team == "blue":
@@ -153,8 +145,6 @@ class Pawn(Piece):
 	#def TRANSMUTE_PAWN_INTO_ANY_OTHER_PIECETYPE_NOT_INCLUDING_KING()
 	#IF current pawn piece moves to enemy starting row, ((0,n)OR(7,n))[piece.direction...?]: PAWN can CHANGE into ANY other piece kind(noKING)
 
-	
-	#######BREAKINGHERE######11-16
 	def determine_possible_moves_straight_pawn(self, potential_spaces):
 		#move_down, move_up, move_left, move_right
 
@@ -172,16 +162,10 @@ class Pawn(Piece):
 
 							if potential_spaces[x].open == False:
 
-								if potential_spaces[x].team == self.team:
-									self.impossible_moves_team.append(cur_move) 
-									first_index_found = True
-									action_taken = True
-									break
-								else:
-									self.impossible_moves_enemy.append(cur_move)
-									first_index_found = True
-									action_taken = True
-									break
+								self.impossible_moves_blocked.append(cur_move)
+								first_index_found = True 
+								action_taken = True 
+								break
 
 							else:
 								self.possible_moves_open.append(cur_move)
@@ -193,7 +177,7 @@ class Pawn(Piece):
 						first_index_found = True
 
 		else:	#check one space in front
-			cur_move = self.cur_space_vec + move_down * self.direction * 2
+			cur_move = self.cur_space_vec + move_down * self.direction #* 2
 
 			for x in range(len(potential_spaces)):
 
@@ -202,16 +186,11 @@ class Pawn(Piece):
 
 					if potential_spaces[x].open == False:
 
-						if potential_spaces[x].team == self.team:
-							self.impossible_moves_team.append(cur_move)
-							first_index_found = True  
-							action_taken = True 
-							break
-						else:
-							self.impossible_moves_enemy.append(cur_move)
-							first_index_found = True 
-							action_taken = True 
-							break
+						self.impossible_moves_blocked.append(cur_move)
+						first_index_found = True 
+						action_taken = True 
+						break
+
 					else:
 						self.possible_moves_open.append(cur_move)
 						action_taken = True 
@@ -235,39 +214,8 @@ class Pawn(Piece):
 	def determine_possible_moves(self, potential_spaces):
 
 		self.determine_possible_moves_straight_pawn(potential_spaces)
-		self.check_space_pawn(potential_spaces, (self.cur_space_vec + move_down + move_left * self.direction))
-		self.check_space_pawn(potential_spaces, (self.cur_space_vec + move_down + move_right * self.direction))
-
-
-
-
-		#1. check first move straight 
-		#2. check second move straight  
-		#3. check attack move right  
-		#4. check attack move left 
-
-		#first two changed? 
-		
-
-		# ###
-		# self.check_space_pawn(potential_spaces, self.cur_space_vec + move_down * self.direction)
-		# if self.init_move == True:
-		# 	self.check_space_pawn(potential_spaces, self.cur_space_vec + (move_down * 2) * self.direction)
-		# self.check_space_pawn(potential_spaces, self.cur_space_vec + move_down * self.direction + move_right)
-		# self.check_space_pawn(potential_spaces, self.cur_space_vec + move_down * self.direction + move_left)
-		# ###
-		
-
-
-		#move_down gets converted to up or down depending on pawn team/direction
-		#pawn_cur_space = u.Vec2(self.col, self.row)
-
-		#self.possible_moves_straight.append((pawn_cur_space + move_down * self.direction))
-		#if self.init_move == True:
-		#	self.possible_moves_straight.append((pawn_cur_space + (move_down * 2) * self.direction))
-		
-		#self.possible_moves_attack.append((pawn_cur_space + move_down * self.direction + move_right))
-		#self.possible_moves_attack.append((pawn_cur_space + move_down * self.direction + move_left))
+		self.check_space_pawn(potential_spaces, (self.cur_space_vec + (move_down * self.direction) + move_left))
+		self.check_space_pawn(potential_spaces, (self.cur_space_vec + (move_down * self.direction) + move_right))
 
 	#enPESSANT
 	#IF in turn previous...OTHERCOLOR PAWN MOVES FROM cols Pos and Neg in relate
@@ -323,7 +271,7 @@ class Knight(Piece):
 		#self.type = 'T'
 		self.move_type = "hopper"
 
-	def determine_possible_moves(self, potential_spaces, cur_move):
+	def determine_possible_moves(self, potential_spaces):
 		#cur_move = self.cur_space_vec
 		self.check_space(potential_spaces, (self.cur_space_vec + (move_up * 2) + move_right))
 		self.check_space(potential_spaces, (self.cur_space_vec + move_up + (move_right * 2)))
@@ -341,7 +289,7 @@ class King(Piece):
 		#self.type = 'K'
 		self.move_type = "hopper"
 
-	def determine_possible_moves(self, potential_spaces, cur_move):
+	def determine_possible_moves(self, potential_spaces):
 		self.check_space(potential_spaces, (self.cur_space_vec + move_up))
 		self.check_space(potential_spaces, (self.cur_space_vec + move_up + move_right))
 		self.check_space(potential_spaces, (self.cur_space_vec + move_right))

@@ -24,7 +24,13 @@ import utils as u
 	
 
 
-
+def set_potential_spaces() -> list:
+	potential_spaces = []
+		
+	for x in range(0, 8):
+		for y in range(0, 8):
+			potential_spaces.append(u.Space(u.Vec2(x, y)))
+	return potential_spaces
 
 class TestPiece(unittest.TestCase):
 
@@ -34,25 +40,19 @@ class TestPiece(unittest.TestCase):
 	# self.impossible_moves_boundary = []
 
 	def test_determine_possible_moves_direction(self):
-		potential_spaces = []
+		potential_spaces = set_potential_spaces()
 		
-		for x in range(0, 8):
-			for y in range(0, 8):
-				potential_spaces.append(u.Space(u.Vec2(x, y)))
-
 		move_down = u.Vec2(0,1)
 		move_up = u.Vec2(0,-1)
 		move_right = u.Vec2(1,0)
 		move_left = u.Vec2(-1,0)
 
 		test_piece = chess_pieces.Piece(3,0,"blue")#queen
+
 		potential_spaces[30].set_space_closed("pawn", "red") #3,6
 		potential_spaces[0].set_space_closed("pawn", "blue") #0,0
 		potential_spaces[10].set_space_closed("pawn", "blue")
-		#print("FUCK")
-		#print(potential_spaces[10])
 
-		#u.Vec2
 		test_vecs_open = [u.Vec2(4,0),u.Vec2(5,0),u.Vec2(6,0),u.Vec2(7,0),
 						  u.Vec2(4,1),u.Vec2(5,2),u.Vec2(6,3),u.Vec2(7,4),
 						  u.Vec2(3,1),u.Vec2(3,2),u.Vec2(3,3),u.Vec2(3,4),u.Vec2(3,5),
@@ -74,23 +74,14 @@ class TestPiece(unittest.TestCase):
 		test_piece.determine_possible_moves_direction(potential_spaces, move_down + move_left)
 		test_piece.determine_possible_moves_direction(potential_spaces, move_left)
 		test_piece.determine_possible_moves_direction(potential_spaces, move_up + move_left)
-		
-		#print(test_piece.possible_moves_open)
-		#print(test_piece.impossible_moves_boundary)
-		#print(test_piece.impossible_moves_team)
-		#print(test_piece.possible_moves_enemy)
 
 		self.assertEqual(test_vecs_open, test_piece.possible_moves_open)
 		self.assertEqual(test_vecs_boundary, test_piece.impossible_moves_boundary)
-		self.assertEqual(test_vecs_ally, test_piece.impossible_moves_team)
+		self.assertEqual(test_vecs_ally, test_piece.impossible_moves_blocked)
 		self.assertEqual(test_vecs_enemy, test_piece.possible_moves_enemy)
 
 	def test_check_space(self):
-		potential_spaces = []
-		
-		for x in range(0, 8):
-			for y in range(0, 8):
-				potential_spaces.append(u.Space(u.Vec2(x, y)))
+		potential_spaces = set_potential_spaces()
 
 		test_piece = chess_pieces.Piece(1, 7, "red") #knight
 
@@ -112,317 +103,173 @@ class TestPiece(unittest.TestCase):
 		test_piece.check_space(potential_spaces, u.Vec2(0, 5))
 
 		self.assertEqual(test_vecs_open, test_piece.possible_moves_open)
-		self.assertEqual(test_vecs_ally, test_piece.impossible_moves_team)
+		self.assertEqual(test_vecs_ally, test_piece.impossible_moves_blocked)
 		self.assertEqual(test_vecs_enemy, test_piece.possible_moves_enemy)
 		self.assertEqual(test_vecs_boundary, test_piece.impossible_moves_boundary)
 
 class TestPawn(unittest.TestCase):
-		potential_spaces = []
-		
-		for x in range(0, 8):
-			for y in range(0, 8):
-				potential_spaces.append(u.Space(u.Vec2(x, y)))
+		def test_determine_possible_moves(self):
+			potential_spaces = set_potential_spaces()
+			potential_spaces[27].set_space_closed("pawn", "red")#3,3
+			potential_spaces[18].set_space_closed("pawn", "red")#2,2
+			potential_spaces[34].set_space_closed("pawn", "blue")#4,2
 
+			test_pawn_one = chess_pieces.Pawn(3,1,"blue")
+			test_pawn_one.determine_possible_moves(potential_spaces)
+
+			self.assertEqual(u.Vec2(3,2), test_pawn_one.possible_moves_open[0])
+			self.assertEqual(u.Vec2(2,2), test_pawn_one.possible_moves_enemy[0])
+			self.assertEqual(u.Vec2(3,3), test_pawn_one.impossible_moves_blocked[0])
+
+			potential_spaces = set_potential_spaces()
+			potential_spaces[8].set_space_closed("pawn", "blue")#1,0
+
+			test_pawn_two = chess_pieces.Pawn(0,1,"red")
+			test_pawn_two.determine_possible_moves(potential_spaces)
+
+			self.assertEqual(u.Vec2(0,0), test_pawn_two.possible_moves_open[0])
+			self.assertEqual(u.Vec2(1,0), test_pawn_two.possible_moves_enemy[0])
+			self.assertEqual(u.Vec2(0,-1), test_pawn_two.impossible_moves_boundary[0])
+
+			potential_spaces = set_potential_spaces()
+			potential_spaces[0].set_space_closed("pawn", "red")#0,0
+			potential_spaces[16].set_space_closed("pawn", "blue")#2,0
+						
+			test_pawn_three = chess_pieces.Pawn(1,1,"red")
+			test_pawn_three.pawn_init_move_set_false()
+			test_pawn_three.determine_possible_moves(potential_spaces)
+
+			self.assertEqual(u.Vec2(2,0), test_pawn_three.possible_moves_enemy[0])
+			self.assertEqual(u.Vec2(1,0), test_pawn_three.possible_moves_open[0])
+
+class TestKing(unittest.TestCase):
+	def test_determine_possible_moves(self):
+		potential_spaces = set_potential_spaces()
+		potential_spaces[0].set_space_closed("pawn", "blue")#0,0
+		potential_spaces[9].set_space_closed("pawn", "red")#1,1
+
+		test_king = chess_pieces.King(0,1,"red")
+		test_king.determine_possible_moves(potential_spaces)
+
+		king_vecs_open = [u.Vec2(1,0), u.Vec2(1,2), u.Vec2(0,2)]
+		king_vecs_enemy = [u.Vec2(0,0)]
+		king_vecs_blocked = [u.Vec2(1,1)]
+		king_vecs_boundary = [u.Vec2(-1,2), u.Vec2(-1,1), u.Vec2(-1,0)]  
+
+		self.assertEqual(king_vecs_open, test_king.possible_moves_open)
+		self.assertEqual(king_vecs_enemy, test_king.possible_moves_enemy)
+		self.assertEqual(king_vecs_blocked, test_king.impossible_moves_blocked)
+		self.assertEqual(king_vecs_boundary, test_king.impossible_moves_boundary)
+
+class TestKnight(unittest.TestCase):
+	def test_determine_possible_moves(self):
+		potential_spaces = set_potential_spaces()
+		potential_spaces[0].set_space_closed("pawn", "blue")#0,0
 		potential_spaces[27].set_space_closed("pawn", "red")#3,3
-		potential_spaces[18].set_space_closed("pawn", "red")#2,2
-		potential_spaces[34].set_space_closed("pawn", "blue")#4,2
-		#print(potential_spaces[34])
 
-		test_pawn_one = chess_pieces.Pawn(3,1,"blue")
-		test_pawn_one.determine_possible_moves(potential_spaces)
+		test_knight = chess_pieces.Knight(1,2,"blue")
+		test_knight.determine_possible_moves(potential_spaces)
 
-		# self.possible_moves_open = []  #straight moves
-		# self.possible_moves_enemy = []  #diag attack moves
-		# self.impossible_moves_team = []  #straight moves blocked by team-piece
-		# self.impossible_moves_boundary = []  #straight moves blocked by boundary
+		knight_vecs_open = [u.Vec2(2,0), u.Vec2(3,1), u.Vec2(2,4), u.Vec2(0,4)]
+		knight_vecs_enemy = [u.Vec2(3,3)]
+		knight_vecs_blocked = [u.Vec2(0,0)]
+		knight_vecs_boundary = [u.Vec2(-1,3), u.Vec2(-1,1)] 
 
-		#(3,3)FRONT
-		#(2,2)attckleft
-		#(4,2)attckright
+		self.assertEqual(knight_vecs_open, test_knight.possible_moves_open)
+		self.assertEqual(knight_vecs_enemy, test_knight.possible_moves_enemy)
+		self.assertEqual(knight_vecs_blocked, test_knight.impossible_moves_blocked)
+		self.assertEqual(knight_vecs_boundary, test_knight.impossible_moves_boundary)
 
-		#print(potential_spaces[27])#3,3
-		#print(potential_spaces[18])#2,2
-		#print(potential_spaces[34])#4,2
+class TestQueen(unittest.TestCase):
+	def test_determine_possible_moves(self):
+		potential_spaces = set_potential_spaces()
+		potential_spaces[38].set_space_closed("pawn", "red")#4,6
+		potential_spaces[1].set_space_closed("queen", "blue")
 
-		
+		test_queen = chess_pieces.Queen(0,2,"red")
+		test_queen.determine_possible_moves(potential_spaces)
 
-		print("FUCK")
-		print(test_pawn_one.possible_moves_open)
-		print(test_pawn_one.possible_moves_enemy)
-		print(test_pawn_one.impossible_moves_enemy)
-		print(test_pawn_one.impossible_moves_team)
-		print(test_pawn_one.impossible_moves_boundary)
+		queen_vecs_open = [u.Vec2(0,3), u.Vec2(0,4), u.Vec2(0,5), u.Vec2(0,6), 
+						   u.Vec2(0,7), u.Vec2(1,2), u.Vec2(2,2), u.Vec2(3,2), 
+						   u.Vec2(4,2), u.Vec2(5,2), u.Vec2(6,2), u.Vec2(7,2), 
+						   u.Vec2(1,1), u.Vec2(2,0), u.Vec2(1,3), u.Vec2(2,4), 
+						   u.Vec2(3,5),
+						   ]
+		queen_vecs_enemy = [u.Vec2(0,1)]
+		queen_vecs_blocked = [u.Vec2(4,6)]
+		queen_vecs_boundary = [u.Vec2(0,8), u.Vec2(-1,2), u.Vec2(3,-1), u.Vec2(-1,3), u.Vec2(-1,1)] 
 
+		self.assertEqual(queen_vecs_open, test_queen.possible_moves_open)
+		self.assertEqual(queen_vecs_enemy, test_queen.possible_moves_enemy)
+		self.assertEqual(queen_vecs_blocked, test_queen.impossible_moves_blocked)
+		self.assertEqual(queen_vecs_boundary, test_queen.impossible_moves_boundary)
 
+class TestBishop(unittest.TestCase):
+	def test_determine_possible_moves(self):
+		potential_spaces = set_potential_spaces()
+		potential_spaces[24].set_space_closed("rook", "blue")#3,0
+		potential_spaces[3].set_space_closed("rook", "red")#0,3
 
+		test_bishop = chess_pieces.Bishop(1,2,"red")
+		test_bishop.determine_possible_moves(potential_spaces)
 
+		bishop_vecs_open = [u.Vec2(2,1), u.Vec2(2,3), u.Vec2(3,4), u.Vec2(4,5), u.Vec2(5,6), u.Vec2(6,7), u.Vec2(0,1)]
+		bishop_vecs_enemy = [u.Vec2(3,0)]
+		bishop_vecs_blocked = [u.Vec2(0,3)]
+		bishop_vecs_boundary = [u.Vec2(7,8), u.Vec2(-1,0)] 
 
+		self.assertEqual(bishop_vecs_open, test_bishop.possible_moves_open)
+		self.assertEqual(bishop_vecs_enemy, test_bishop.possible_moves_enemy)
+		self.assertEqual(bishop_vecs_blocked, test_bishop.impossible_moves_blocked)
+		self.assertEqual(bishop_vecs_boundary, test_bishop.impossible_moves_boundary)
 
-		
+class TestRook(unittest.TestCase):
+	def test_determine_possible_moves(self):
+		potential_spaces = set_potential_spaces()
+		potential_spaces[29].set_space_closed("rook", "blue")#3,5
+		potential_spaces[56].set_space_closed("queen", "red")#7,0
 
-		
+		test_rook = chess_pieces.Rook(3,0,"red")
+		test_rook.determine_possible_moves(potential_spaces)
 
+		rook_vecs_open = [u.Vec2(3,1), u.Vec2(3,2), u.Vec2(3,3), u.Vec2(3,4), 
+							u.Vec2(2,0), u.Vec2(1,0), u.Vec2(0,0), u.Vec2(4,0), 
+							u.Vec2(5,0), u.Vec2(6,0),
+							]
+		rook_vecs_enemy = [u.Vec2(3,5)]
+		rook_vecs_blocked = [u.Vec2(7,0)]
+		rook_vecs_boundary = [u.Vec2(3,-1), u.Vec2(-1,0)]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# class TestKing(unittest.TestCase):
-# 	def test_determine_possible_moves(self):
-# 		test_king = chess_pieces.King(3,7,"red")
-# 		test_king.determine_possible_moves()
-
-# 		#UP-RIGHT-CLOCKWISE>
-
-# 		test_vecs = [u.Vec2(3,6),
-# 					 u.Vec2(4,6),
-# 					 u.Vec2(4,7),
-# 					 u.Vec2(4,8),
-# 					 u.Vec2(3,8),
-# 					 u.Vec2(2,8),
-# 					 u.Vec2(2,7),
-# 					 u.Vec2(2,6),
-# 					 ]
-
-# 		for vec in range(len(test_vecs)):
-# 			self.assertEqual(test_vecs[vec].xy, test_king.possible_moves[vec].xy)
-
-# class TestKnight(unittest.TestCase):
-# 	def test_determine_possible_moves(self):
-# 		test_knight =  chess_pieces.Knight(6,0,"blue")
-# 		test_knight.determine_possible_moves()
-
-# 		#UP-RIGHT-CLOCKWISE>
-
-# 		test_vecs = [u.Vec2(7,-2),
-# 	     			 u.Vec2(8,-1),
-# 					 u.Vec2(8,1),
-# 					 u.Vec2(7,2),
-# 					 u.Vec2(5,2),
-# 					 u.Vec2(4,1),
-# 					 u.Vec2(4,-1),
-# 					 u.Vec2(5,-2),
-# 				    ]
-
-# 		for vec in range(len(test_vecs)):
-# 			self.assertEqual(test_vecs[vec].xy, test_knight.possible_moves[vec].xy)
-
-# class TestQueen(unittest.TestCase):
-# 	def test_determine_possible_moves(self):
-# 		test_queen = chess_pieces.Queen(3,0,"blue")
-# 		test_queen.determine_possible_moves()
-
-# 		test_vecs_up = [u.Vec2(3,-1),
-# 				   	    u.Vec2(3,-2),
-# 				    	u.Vec2(3,-3),
-# 						u.Vec2(3,-4),
-# 						u.Vec2(3,-5),
-# 						u.Vec2(3,-6),
-# 						u.Vec2(3,-7),
-# 						]
-# 		test_vecs_down = [u.Vec2(3,1),
-# 						  u.Vec2(3,2),
-# 						  u.Vec2(3,3),
-# 						  u.Vec2(3,4),
-# 						  u.Vec2(3,5),
-# 						  u.Vec2(3,6),
-# 						  u.Vec2(3,7),
-# 						 ]
-# 		test_vecs_right = [u.Vec2(4,0),
-# 						   u.Vec2(5,0),
-# 						   u.Vec2(6,0),
-# 						   u.Vec2(7,0),
-# 						   u.Vec2(8,0),
-# 						   u.Vec2(9,0),
-# 						   u.Vec2(10,0),
-# 						  ]
-# 		test_vecs_left = [u.Vec2(2,0),
-# 						  u.Vec2(1,0),
-# 						  u.Vec2(0,0),
-# 						  u.Vec2(-1,0),
-# 						  u.Vec2(-2,0),
-# 						  u.Vec2(-3,0),
-# 						  u.Vec2(-4,0),
-# 						 ]
-# 		test_vecs_up_right = [u.Vec2(4,-1),
-# 							  u.Vec2(5,-2),
-# 							  u.Vec2(6,-3),
-# 							  u.Vec2(7,-4),
-# 							  u.Vec2(8,-5),
-# 							  u.Vec2(9,-6),
-# 							  u.Vec2(10,-7),
-# 							 ]
-# 		test_vecs_up_left = [u.Vec2(2,-1),
-# 							 u.Vec2(1,-2),
-# 							 u.Vec2(0,-3),
-# 							 u.Vec2(-1,-4),
-# 							 u.Vec2(-2,-5),
-# 							 u.Vec2(-3,-6),
-# 							 u.Vec2(-4,-7),
-# 							 ]
-# 		test_vecs_down_right = [u.Vec2(4,1),
-# 							    u.Vec2(5,2),
-# 							    u.Vec2(6,3),
-# 							    u.Vec2(7,4),
-# 							    u.Vec2(8,5),
-# 							    u.Vec2(9,6),
-# 							    u.Vec2(10,7),
-# 							   ]
-# 		test_vecs_down_left = [u.Vec2(2,1),
-# 							   u.Vec2(1,2),
-# 							   u.Vec2(0,3),
-# 							   u.Vec2(-1,4),
-# 							   u.Vec2(-2,5),
-# 							   u.Vec2(-3,6),
-# 							   u.Vec2(-4,7),
-# 							  ]
-
-# 		for vec in range(len(test_vecs_up)):
-# 			self.assertEqual(test_vecs_up[vec].xy, test_queen.possible_moves_up[vec].xy)
-# 			self.assertEqual(test_vecs_down[vec].xy, test_queen.possible_moves_down[vec].xy)
-# 			self.assertEqual(test_vecs_left[vec].xy, test_queen.possible_moves_left[vec].xy)
-# 			self.assertEqual(test_vecs_right[vec].xy, test_queen.possible_moves_right[vec].xy)
-# 			self.assertEqual(test_vecs_up_right[vec].xy, test_queen.possible_moves_up_right[vec].xy)
-# 			self.assertEqual(test_vecs_up_left[vec].xy, test_queen.possible_moves_up_left[vec].xy)
-# 			self.assertEqual(test_vecs_down_right[vec].xy, test_queen.possible_moves_down_right[vec].xy)
-# 			self.assertEqual(test_vecs_down_left[vec].xy, test_queen.possible_moves_down_left[vec].xy)
-	
-
-# class TestBishop(unittest.TestCase):
-# 	def test_determine_possible_moves(self):
-# 		test_bishop = chess_pieces.Bishop(2, 0, "blue")
-# 		test_bishop.determine_possible_moves()
-
-# 		#(2, 0)
-# 		test_vecs_up_right = [u.Vec2(3,-1),
-# 							  u.Vec2(4,-2),
-# 							  u.Vec2(5,-3),
-# 							  u.Vec2(6,-4),
-# 							  u.Vec2(7,-5),
-# 							  u.Vec2(8,-6),
-# 							  u.Vec2(9,-7),
-# 							 ]
-
-# 		test_vecs_up_left = [u.Vec2(1,-1),
-# 							 u.Vec2(0,-2),
-# 							 u.Vec2(-1,-3),
-# 							 u.Vec2(-2,-4),
-# 							 u.Vec2(-3,-5),
-# 							 u.Vec2(-4,-6),
-# 							 u.Vec2(-5,-7),
-# 							 ]
-
-# 		test_vecs_down_right = [u.Vec2(3,1),
-# 							    u.Vec2(4,2),
-# 							    u.Vec2(5,3),
-# 							    u.Vec2(6,4),
-# 							    u.Vec2(7,5),
-# 							    u.Vec2(8,6),
-# 							    u.Vec2(9,7),
-# 							   ]
-
-# 		test_vecs_down_left = [u.Vec2(1,1),
-# 							   u.Vec2(0,2),
-# 							   u.Vec2(-1,3),
-# 							   u.Vec2(-2,4),
-# 							   u.Vec2(-3,5),
-# 							   u.Vec2(-4,6),
-# 							   u.Vec2(-5,7),
-# 							  ]
-
-# 		for vec in range(len(test_vecs_up_right)):
-# 			self.assertEqual(test_vecs_up_right[vec].xy, test_bishop.possible_moves_up_right[vec].xy)
-# 			self.assertEqual(test_vecs_up_left[vec].xy, test_bishop.possible_moves_up_left[vec].xy)
-# 			self.assertEqual(test_vecs_down_right[vec].xy, test_bishop.possible_moves_down_right[vec].xy)
-# 			self.assertEqual(test_vecs_down_left[vec].xy, test_bishop.possible_moves_down_left[vec].xy)
-
-# class TestRook(unittest.TestCase):
-# 	def test_determine_possible_moves(self):
-		
-
-# 		test_vecs_up = [u.Vec2(0,6),
-# 				   	    u.Vec2(0,5),
-# 				    	u.Vec2(0,4),
-# 						u.Vec2(0,3),
-# 						u.Vec2(0,2),
-# 						u.Vec2(0,1),
-# 						u.Vec2(0,0),
-# 						]
-# 		test_vecs_down = [u.Vec2(0,8),
-# 						  u.Vec2(0,9),
-# 						  u.Vec2(0,10),
-# 						  u.Vec2(0,11),
-# 						  u.Vec2(0,12),
-# 						  u.Vec2(0,13),
-# 						  u.Vec2(0,14),
-# 						 ]
-# 		test_vecs_right = [u.Vec2(1,7),
-# 						   u.Vec2(2,7),
-# 						   u.Vec2(3,7),
-# 						   u.Vec2(4,7),
-# 						   u.Vec2(5,7),
-# 						   u.Vec2(6,7),
-# 						   u.Vec2(7,7),
-# 						  ]
-# 		test_vecs_left = [u.Vec2(-1,7),
-# 						  u.Vec2(-2,7),
-# 						  u.Vec2(-3,7),
-# 						  u.Vec2(-4,7),
-# 						  u.Vec2(-5,7),
-# 						  u.Vec2(-6,7),
-# 						  u.Vec2(-7,7),
-# 						 ]
-
-
-		
-
-# 		test_rook_red = chess_pieces.Rook(0,7,"red")
-# 		test_rook_red.determine_possible_moves()
+		self.assertEqual(rook_vecs_open, test_rook.possible_moves_open)
+		self.assertEqual(rook_vecs_enemy, test_rook.possible_moves_enemy)
+		self.assertEqual(rook_vecs_blocked, test_rook.impossible_moves_blocked)
+		self.assertEqual(rook_vecs_boundary, test_rook.impossible_moves_boundary)
 
 
 
-# 		for vec in range(len(test_vecs_up)):
-# 			self.assertEqual(test_vecs_up[vec].xy, test_rook_red.possible_moves_up[vec].xy)
-# 		for vec in range(len(test_vecs_down)):
-# 			self.assertEqual(test_vecs_down[vec].xy, test_rook_red.possible_moves_down[vec].xy)
-# 		for vec in range(len(test_vecs_right)):
-# 			self.assertEqual(test_vecs_right[vec].xy, test_rook_red.possible_moves_right[vec].xy)
-# 		for vec in range(len(test_vecs_left)):
-# 			self.assertEqual(test_vecs_left[vec].xy, test_rook_red.possible_moves_left[vec].xy)
 
 
-	# def test_determine_possible_moves_real(self):
-
-	# 	#print("FUCK")
 
 
-	# 	# test_vecs_down_real = [u.Vec2(0,8),
-	# 	# 				       u.Vec2(0,9),
-	# 	# 				  	   u.Vec2(0,10),
-	# 	# 				  	   u.Vec2(0,11),
-	# 	# 				  	   u.Vec2(0,12),
-	# 	# 				  	   u.Vec2(0,13),
-	# 	# 				  	   u.Vec2(0,14),
-	# 	# 				 	   ]
 
-	# 	test_potential_pieces_real = []
-		
-	# 	for x in range(0, 8):
-	# 		for y in range(0, 8):
-	# 			test_potential_pieces_real.append(u.Space(u.Vec2(x, y)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
