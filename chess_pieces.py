@@ -28,7 +28,7 @@ class Piece():
 		self.team = team
 		self.type = ''
 		###
-		#possible death index for order of death. 
+		#possible death index for order of death.
 		#self.death_index = 0
 
 		self.possible_moves_open = []
@@ -46,7 +46,7 @@ class Piece():
 	# string representation of object
 	def __repr__(self):
 		#if self.type != '':
-		return str(self.vec.x) + "," + str(self.vec.y) + "," + str((self.vec.x, self.vec.y)) + "," + str(self.team) + "," + str(self.type)
+		return str((self.vec.x, self.vec.y)) + "," + str(self.team) + "," + str(self.type)
 		#else:
 		#	return str(self.col) + "," + str(self.row) + "," + str(self.cur_space) + "," + str(self.team)
 
