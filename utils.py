@@ -5,7 +5,7 @@ class Vec2():
 	def __init__(self, x:int, y:int):
 		self.x = x
 		self.y = y
-		self.xy = (self.x, self.y)
+		#self.xy = (self.x, self.y)
 
 	def __add__(self, other_vec:Vec2) -> Vec2:
 		x = self.x + other_vec.x
@@ -40,17 +40,18 @@ class Vec2():
 class Space():
 	def __init__(self, vec:Vec2):
 		self.vec = vec
-		self.x = vec.x 
-		self.y = vec.y 
-		self.xy = (self.x, self.y)
+		#self.x = vec.x 
+		#self.y = vec.y 
+		#self.xy = (self.x, self.y)
 		self.open = True
 		#self.closed = False
 		self.piece = ''
 		self.team = ''
+		self.closed_this_turn = False
 
 
 	def __repr__(self):
-		return "Space({})".format(self.vec)
+		return "Space({},{},{})".format(self.vec, self.open, self.piece)
 
 	def set_space_closed(self, piece_name, team):
 		self.open = False
@@ -61,6 +62,7 @@ class Space():
 	def set_space_open(self):
 		self.open = True 
 		self.team = ''
+		self.piece = ''
 
 
 # class Movement():

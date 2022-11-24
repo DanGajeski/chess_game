@@ -11,27 +11,33 @@ class Board():
 		self.cols = 8
 		
 		###
-		self.blue_pawns = []
-		self.blue_rooks = []
-		self.blue_knights = []
-		self.blue_bishops = []
-		self.blue_queen = []
-		self.blue_king = []
+		# self.blue_pawns = []
+		# self.blue_rooks = []
+		# self.blue_knights = []
+		# self.blue_bishops = []
+		# self.blue_queen = []
+		# self.blue_king = []
 		###
-		self.red_pawns = []
-		self.red_rooks = []
-		self.red_knights = []
-		self.red_bishops = []
-		self.red_queen = []
-		self.red_king = []
+		# self.red_pawns = []
+		# self.red_rooks = []
+		# self.red_knights = []
+		# self.red_bishops = []
+		# self.red_queen = []
+		# self.red_king = []
 		###
 		self.living_list = []
+		self.dead_list =[]#move dead pieces here?
+		self.dead_index = 0
+		
+		self.turn_zero = []
+		self.turn_one = []
+		self.turn_two = []#...saving turns in lists? 
 
 		self.potential_spaces = []  #set_potential_spaces to fill with u.Space objects
 
 		def set_potential_spaces():
-			for x in range(0, 8):
-				for y in range(0, 8):
+			for y in range(0, 8):
+				for x in range(0, 8):
 					self.potential_spaces.append(u.Space(u.Vec2(x, y)))
 
 		set_potential_spaces()
@@ -68,12 +74,55 @@ class Board():
 
 	def set_open_closed_spaces(self):
 		for space in self.potential_spaces:
+			space.closed_this_turn = False
+		for space in self.potential_spaces:
 			for piece in self.living_list:
-				if piece.cur_space == space.xy:
+				if piece.vec == space.vec:
 					space.set_space_closed(piece.__class__.__name__, piece.team)
+					space.closed_this_turn = True
+		for space in self.potential_spaces:
+			if space.closed_this_turn == False:
+				space.set_space_open()
+
+	def print_spaces_for_test(self):
+		for space in self.potential_spaces:
+			print(space)
+	def print_dead_for_test(self):
+		for dead_piece in self.dead_list:
+			print(dead_piece)
 
 
-	#checked possible moves
+
+	def list_active_pieces(self) -> None:
+		for index, piece in enumerate(self.living_list):
+			print("{}: {}".format(index, piece))
+
+	def select_piece_display_movements(self, piece_index) -> None:
+		self.living_list[piece_index].determine_possible_moves(self.potential_spaces)
+		self.living_list[piece_index].display_moves()
+
+	def move_piece_test(self, piece_index:int, x:int, y:int) -> None:
+		completed = False
+		for index, piece in enumerate(self.living_list):
+			if self.living_list[index].vec.x == x and self.living_list[index].vec.y == y:
+				self.dead_list.append(self.living_list[index])
+				self.living_list[index].vec.x = self.dead_index - 1
+				self.living_list[index].vec.y = self.dead_index -1
+				self.dead_index -= 1
+				self.living_list[piece_index].vec.x = x  
+				self.living_list[piece_index].vec.y = y
+				del self.living_list[index]
+				completed = True
+				break
+		if completed == False:
+			self.living_list[piece_index].vec.x = x 
+			self.living_list[piece_index].vec.y = y 
+
+
+
+
+
+	#checked possible moves 
 	# current move verified, space verified to be currently closed
 
 	# previous claimed space made empty
@@ -109,7 +158,7 @@ class Board():
 			
 			symbol = " "
 			for d in range(len(self.living_list)):
-				if c == self.living_list[d].col and r == self.living_list[d].row:
+				if c == self.living_list[d].vec.x and r == self.living_list[d].vec.y:
 					symbol = self.living_list[d].type
 			return symbol
 
@@ -148,109 +197,121 @@ class Board():
 
 	def initialize_both_teams(self):
 		
-		def initialize_blue_team():
+		for n in range(0,8):
+			self.living_list.append(Pawn(u.Vec2(n,1),"blue"))
+		self.living_list.append(Knight(u.Vec2(1,0),"blue"))
+		self.living_list.append(Knight(u.Vec2(6,0),"blue"))
+		self.living_list.append(Rook(u.Vec2(0,0),"blue"))
+		self.living_list.append(Rook(u.Vec2(7,0),"blue"))
+		self.living_list.append(Bishop(u.Vec2(2,0),"blue"))
+		self.living_list.append(Bishop(u.Vec2(5,0),"blue"))
+		self.living_list.append(Queen(u.Vec2(3,0),"blue"))
+		self.living_list.append(King(u.Vec2(4,0),"blue"))
 
-			def initialize_blue_pawns():
-				for n in range(0,8):
-					self.blue_pawns.append(Pawn(n, 1, "blue"))
-					#self.blue_pawns[n].set_location().shit_my_pants() Method chaining - .set_location() would have to return self
+		for n in range(0,8):
+			self.living_list.append(Pawn(u.Vec2(n,6),"red"))
+		self.living_list.append(Knight(u.Vec2(1,7),"red"))
+		self.living_list.append(Knight(u.Vec2(6,7),"red"))
+		self.living_list.append(Rook(u.Vec2(0,7),"red"))
+		self.living_list.append(Rook(u.Vec2(7,7),"red"))
+		self.living_list.append(Bishop(u.Vec2(2,7),"red"))
+		self.living_list.append(Bishop(u.Vec2(5,7),"red"))
+		self.living_list.append(Queen(u.Vec2(3,7),"red"))
+		self.living_list.append(King(u.Vec2(4,7),"red"))
 
-			def initialize_blue_knights():
-				#self.blue_knights.append(Knight(1, 2))
-				#self.blue_knights.append(Knight(1, 7))
-				self.blue_knights = [Knight(1, 0, "blue"), Knight(6, 0, "blue")]
 
-			def initialize_blue_rooks():
-				self.blue_rooks = [Rook(0, 0, "blue"), Rook(7, 0, "blue")]
 
-			def initialize_blue_bishops():
-				self.blue_bishops = [Bishop(2, 0, "blue"), Bishop(5, 0, "blue")]
+		# def initialize_blue_team():
 
-			def initialize_blue_queen():
-				self.blue_queen = [Queen(3, 0, "blue")]
 
-			def initialize_blue_king():
-				self.blue_king = [King(4, 0, "blue")]
+			
 
-			initialize_blue_pawns()
-			initialize_blue_knights()
-			initialize_blue_rooks()
-			initialize_blue_bishops()
-			initialize_blue_queen()
-			initialize_blue_king()
 
-		def initialize_red_team():
+			# def initialize_blue_pawns():
+			# 		#self.blue_pawns[n].set_location().shit_my_pants() Method chaining - .set_location() would have to return self
+			# def initialize_blue_knights():
+			# 	#self.blue_knights.append(Knight(1, 2))
+			# 	#self.blue_knights.append(Knight(1, 7))
+			# def initialize_blue_rooks():
+			# def initialize_blue_bishops():
+			# def initialize_blue_queen():
+			# def initialize_blue_king():
 
-			def initialize_red_pawns():
-				for n in range(0,8):
-					self.red_pawns.append(Pawn(n, 6, "red"))
-					
-			def initialize_red_knights():
-				self.red_knights = [Knight(1, 7, "red"), Knight(6, 7, "red")]
+			# initialize_blue_pawns()
+			# initialize_blue_knights()
+			# initialize_blue_rooks()
+			# initialize_blue_bishops()
+			# initialize_blue_queen()
+			# initialize_blue_king()
 
-			def initialize_red_rooks():
-				self.red_rooks = [Rook(0, 7, "red"), Rook(7, 7, "red")]
+		# def initialize_red_team():
 
-			def initialize_red_bishops():
-				self.red_bishops = [Bishop(2, 7, "red"), Bishop(5, 7, "red")]
+			
 
-			def initialize_red_queen():
-				self.red_queen = [Queen(4, 7, "red")]
 
-			def initialize_red_king():
-				self.red_king = [King(3, 7, "red")]
+			# def initialize_red_pawns():
+			# def initialize_red_knights():
+			# def initialize_red_rooks():
+			# def initialize_red_bishops():
+			# def initialize_red_queen():
+			# def initialize_red_king():
+				
+			# initialize_red_pawns()
+			# initialize_red_knights()
+			# initialize_red_rooks()
+			# initialize_red_bishops()
+			# initialize_red_queen()
+			# initialize_red_king()
 
-			initialize_red_pawns()
-			initialize_red_knights()
-			initialize_red_rooks()
-			initialize_red_bishops()
-			initialize_red_queen()
-			initialize_red_king()
+		# def collect_them_all():
 
-		def collect_them_all():
-
-			def collector(collect_from):
-				for n in range(len(collect_from)):
-					self.living_list.append(collect_from[n])
+		# 	def collector(collect_from):
+		# 		for n in range(len(collect_from)):
+		# 			self.living_list.append(collect_from[n])
 
 			#for n in self.blue_team:
 
+		# 	collector(self.blue_pawns)
+		# 	collector(self.blue_knights)
+		# 	collector(self.blue_rooks)
+		# 	collector(self.blue_bishops)
+		# 	collector(self.blue_queen)
+		# 	collector(self.blue_king)
 
-			collector(self.blue_pawns)
-			collector(self.blue_knights)
-			collector(self.blue_rooks)
-			collector(self.blue_bishops)
-			collector(self.blue_queen)
-			collector(self.blue_king)
+		# 	collector(self.red_pawns)
+		# 	collector(self.red_knights)
+		# 	collector(self.red_rooks)
+		# 	collector(self.red_bishops)
+		# 	collector(self.red_queen)
+		# 	collector(self.red_king)
 
-			collector(self.red_pawns)
-			collector(self.red_knights)
-			collector(self.red_rooks)
-			collector(self.red_bishops)
-			collector(self.red_queen)
-			collector(self.red_king)
-
-		initialize_blue_team()
-		initialize_red_team()
-		collect_them_all()
+		# initialize_blue_team()
+		# initialize_red_team()
+		# collect_them_all()
 
 		# moves piece from (c,r) to (nc, nr) and if (nc, nr) already occup. deletes occupying piece
-	def move_piece_test(self, c, r, nc, nr):
-		piece_del_index = -1
-		for test_piece in range(len(self.living_list)):
-			if self.living_list[test_piece].col == c and self.living_list[test_piece].row == r:
+	
+	# def move_piece_test(self, c, r, nc, nr):
+	# 	piece_del_index = -1
+	# 	for test_piece in range(len(self.living_list)):
+	# 		if self.living_list[test_piece].vec.x == c and self.living_list[test_piece].vec.y == r:
 
-				for test_piece_two in range(len(self.living_list)):
+	# 			for test_piece_two in range(len(self.living_list)):
 
-					if self.living_list[test_piece_two].col == nc and self.living_list[test_piece_two].row == nr:
 
-						piece_del_index = test_piece_two 
 
-				self.living_list[test_piece].col = nc 
-				self.living_list[test_piece].row = nr
 
-		if piece_del_index >= 0:
-			del self.living_list[piece_del_index]
+
+	# 				if self.living_list[test_piece_two].vec.x == nc and self.living_list[test_piece_two].vec.y == nr:
+
+	# 					piece_del_index = test_piece_two 
+
+	# 			self.living_list[test_piece].vec.x = nc 
+	# 			self.living_list[test_piece].vec.y = nr
+	# 			#self.living_list[test_piece].vec.xy = (nc, nr)
+
+	# 	if piece_del_index >= 0:
+	# 		del self.living_list[piece_del_index]
 
 	# def piece_movement_logic
 

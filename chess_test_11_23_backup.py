@@ -47,7 +47,7 @@ class TestPiece(unittest.TestCase):
 		move_right = u.Vec2(1,0)
 		move_left = u.Vec2(-1,0)
 
-		test_piece = chess_pieces.Piece(u.Vec2(3,0),"blue")#queen
+		test_piece = chess_pieces.Piece(3,0,"blue")#queen
 
 		potential_spaces[30].set_space_closed("pawn", "red") #3,6
 		potential_spaces[0].set_space_closed("pawn", "blue") #0,0
@@ -83,7 +83,7 @@ class TestPiece(unittest.TestCase):
 	def test_check_space(self):
 		potential_spaces = set_potential_spaces()
 
-		test_piece = chess_pieces.Piece(u.Vec2(1,7), "red") #knight
+		test_piece = chess_pieces.Piece(1, 7, "red") #knight
 
 		potential_spaces[21].set_space_closed("pawn", "blue")
 		potential_spaces[30].set_space_closed("pawn", "red")
@@ -114,7 +114,7 @@ class TestPawn(unittest.TestCase):
 		potential_spaces[18].set_space_closed("pawn", "red")#2,2
 		potential_spaces[34].set_space_closed("pawn", "blue")#4,2
 
-		test_pawn_one = chess_pieces.Pawn(u.Vec2(3,1),"blue")
+		test_pawn_one = chess_pieces.Pawn(3,1,"blue")
 		test_pawn_one.determine_possible_moves(potential_spaces)
 
 		self.assertEqual(u.Vec2(3,2), test_pawn_one.possible_moves_open[0])
@@ -124,7 +124,7 @@ class TestPawn(unittest.TestCase):
 		potential_spaces = set_potential_spaces()
 		potential_spaces[8].set_space_closed("pawn", "blue")#1,0
 
-		test_pawn_two = chess_pieces.Pawn(u.Vec2(0,1),"red")
+		test_pawn_two = chess_pieces.Pawn(0,1,"red")
 		test_pawn_two.determine_possible_moves(potential_spaces)
 
 		self.assertEqual(u.Vec2(0,0), test_pawn_two.possible_moves_open[0])
@@ -135,7 +135,7 @@ class TestPawn(unittest.TestCase):
 		potential_spaces[0].set_space_closed("pawn", "red")#0,0
 		potential_spaces[16].set_space_closed("pawn", "blue")#2,0
 					
-		test_pawn_three = chess_pieces.Pawn(u.Vec2(1,1),"red")
+		test_pawn_three = chess_pieces.Pawn(1,1,"red")
 		test_pawn_three.pawn_init_move_set_false()
 		test_pawn_three.determine_possible_moves(potential_spaces)
 
@@ -148,7 +148,7 @@ class TestKing(unittest.TestCase):
 		potential_spaces[0].set_space_closed("pawn", "blue")#0,0
 		potential_spaces[9].set_space_closed("pawn", "red")#1,1
 
-		test_king = chess_pieces.King(u.Vec2(0,1),"red")
+		test_king = chess_pieces.King(0,1,"red")
 		test_king.determine_possible_moves(potential_spaces)
 
 		king_vecs_open = [u.Vec2(1,0), u.Vec2(1,2), u.Vec2(0,2)]
@@ -167,7 +167,7 @@ class TestKnight(unittest.TestCase):
 		potential_spaces[0].set_space_closed("pawn", "blue")#0,0
 		potential_spaces[27].set_space_closed("pawn", "red")#3,3
 
-		test_knight = chess_pieces.Knight(u.Vec2(1,2),"blue")
+		test_knight = chess_pieces.Knight(1,2,"blue")
 		test_knight.determine_possible_moves(potential_spaces)
 
 		knight_vecs_open = [u.Vec2(2,0), u.Vec2(3,1), u.Vec2(2,4), u.Vec2(0,4)]
@@ -186,7 +186,7 @@ class TestQueen(unittest.TestCase):
 		potential_spaces[38].set_space_closed("pawn", "red")#4,6
 		potential_spaces[1].set_space_closed("queen", "blue")
 
-		test_queen = chess_pieces.Queen(u.Vec2(0,2),"red")
+		test_queen = chess_pieces.Queen(0,2,"red")
 		test_queen.determine_possible_moves(potential_spaces)
 
 		queen_vecs_open = [u.Vec2(0,3), u.Vec2(0,4), u.Vec2(0,5), u.Vec2(0,6), 
@@ -210,7 +210,7 @@ class TestBishop(unittest.TestCase):
 		potential_spaces[24].set_space_closed("rook", "blue")#3,0
 		potential_spaces[3].set_space_closed("rook", "red")#0,3
 
-		test_bishop = chess_pieces.Bishop(u.Vec2(1,2),"red")
+		test_bishop = chess_pieces.Bishop(1,2,"red")
 		test_bishop.determine_possible_moves(potential_spaces)
 
 		bishop_vecs_open = [u.Vec2(2,1), u.Vec2(2,3), u.Vec2(3,4), u.Vec2(4,5), u.Vec2(5,6), u.Vec2(6,7), u.Vec2(0,1)]
@@ -229,7 +229,7 @@ class TestRook(unittest.TestCase):
 		potential_spaces[29].set_space_closed("rook", "blue")#3,5
 		potential_spaces[56].set_space_closed("queen", "red")#7,0
 
-		test_rook = chess_pieces.Rook(u.Vec2(3,0),"red")
+		test_rook = chess_pieces.Rook(3,0,"red")
 		test_rook.determine_possible_moves(potential_spaces)
 
 		rook_vecs_open = [u.Vec2(3,1), u.Vec2(3,2), u.Vec2(3,3), u.Vec2(3,4), 
