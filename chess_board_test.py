@@ -1,4 +1,4 @@
-# 0 Based Indexing EVERYWHEREWEEREWREWRWERWEREWR
+# 0 Based Indexing EVERYWHEREWEEREWREWRWERWEREWR you've got this even when you think you don't.  
 # DDont believee the liES in your MiNd
 from __future__ import annotations
 from chess_pieces import Pawn, Knight, Rook, Bishop, Queen, King
@@ -28,6 +28,9 @@ class Board():
 		self.living_list = []
 		self.dead_list =[]#move dead pieces here?
 		self.dead_index = 0
+
+		self.en_pessant = False
+		self.en_pessant_coords = []#0index=x, 1index=init_y, 2index=final_y
 		
 		self.turn_zero = []
 		self.turn_one = []
@@ -98,10 +101,22 @@ class Board():
 			print("{}: {}".format(index, piece))
 
 	def select_piece_display_movements(self, piece_index) -> None:
-		self.living_list[piece_index].determine_possible_moves(self.potential_spaces)
-		self.living_list[piece_index].display_moves()
+		if self.en_pessant == True and self.living_list[piece_index].type == 'P' and abs(self.living_list[piece_index].vec.x - self.en_pessant_coords[0]) == 1:
+			self.living_list[piece_index].determine_possible_moves(self.potential_spaces)
+			if self.living_list[piece_index].team == 'blue':
+				self.living_list[piece_index].add_en_pessant_move(self.en_pessant_coords[0], (self.en_pessant_coords[1]-1))
+			else:
+				self.living_list[piece_index].add_en_pessant_move(self.en_pessant_coords[0], (self.en_pessant_coords[1]+1))
+			self.living_list[piece_index].display_moves()
+		else:
+			self.living_list[piece_index].determine_possible_moves(self.potential_spaces)
+			self.living_list[piece_index].display_moves()
+		#if self.en_pessant == True and if self.living_list[piece_index].type == 'P' and if abs(self.living_list[piece_index].x - self.en_pessant[0]) == 1:
+		#you are kicking ass.  keep ignoring the lies in your head.  
 
 	def move_piece_test(self, piece_index:int, x:int, y:int) -> None:
+		self.en_pessant = False
+		self.en_pessant_coords = []
 		completed = False
 		for index, piece in enumerate(self.living_list):
 			if self.living_list[index].vec.x == x and self.living_list[index].vec.y == y:
@@ -109,14 +124,59 @@ class Board():
 				self.living_list[index].vec.x = self.dead_index - 1
 				self.living_list[index].vec.y = self.dead_index -1
 				self.dead_index -= 1
+				# if self.living_list[piece_index].type == 'P':
+				# 	if abs(self.living_list[piece_index].vec.y - y) == 2:
+				# 		self.en_pessant = True
+				# 		self.en_pessant_coords = [self.living_list[piece_index].vec.x, self.living_list[piece_index].vec.y, y]
 				self.living_list[piece_index].vec.x = x  
 				self.living_list[piece_index].vec.y = y
 				del self.living_list[index]
 				completed = True
 				break
 		if completed == False:
-			self.living_list[piece_index].vec.x = x 
-			self.living_list[piece_index].vec.y = y 
+			if self.living_list[piece_index].type == 'P':
+				if abs(self.living_list[piece_index].vec.y - y) == 2 and self.living_list[piece_index].vec.x == x:
+					self.en_pessant = True
+					self.en_pessant_coords = [self.living_list[piece_index].vec.x, self.living_list[piece_index].vec.y, y]
+					self.living_list[piece_index].vec.x = x 
+					self.living_list[piece_index].vec.y = y 
+				elif u.Vec2(x, y) == self.living_list[piece_index].en_pessant_move[0]:
+					for index, piece in enumerate(self.living_list):
+						if self.living_list[piece_index].team == 'blue':
+							if u.Vec2(x, y-1) == piece.vec:
+								self.dead_list.append(self.living_list[index])
+								self.living_list[index].vec.x = self.dead_index - 1
+								self.living_list[index].vec.y = self.dead_index - 1
+								self.dead_index -= 1
+
+								self.living_list[piece_index].vec.x = x 
+								self.living_list[piece_index].vec.y = y 
+								del self.living_list[index]
+								break
+						else:
+							if u.Vec2(x, y+1) == piece.vec:
+								self.dead_list.append(self.living_list[index])
+								self.living_list[index].vec.x = self.dead_index - 1
+								self.living_list[index].vec.y = self.dead_index - 1
+								self.dead_index -= 1
+
+								self.living_list[piece_index].vec.x = x 
+								self.living_list[piece_index].vec.y = y 
+								del self.living_list[index]
+								break
+					#self.dead_list.append()
+				else:
+					self.living_list[piece_index].vec.x = x 
+					self.living_list[piece_index].vec.y = y
+			else:
+				self.living_list[piece_index].vec.x = x 
+				self.living_list[piece_index].vec.y = y 
+
+		# if self.living_list[piece_index].type == 'P':
+		# 	if |self.living_list[piece_index].vec.y - y| == 2:
+		# 		self.en_pessant = True:
+		# 		self.en_pessant_coords = [self.living_list[piece_index].vec.x, self.living_list[piece_index].vec.y, y]
+
 
 
 

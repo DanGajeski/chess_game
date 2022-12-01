@@ -145,6 +145,8 @@ class Pawn(Piece):
 		self.type = 'P'
 		self.move_type = "hopper"
 		self.init_move = True
+		self.en_pessant_move = [u.Vec2(-1,-1)]
+		#self.en_pessant_move = u.Vec2(0,0)
 
 		#self.possible_en_pessant_move = []
 
@@ -156,6 +158,13 @@ class Pawn(Piece):
 	#nolongerneeded--appliedtoPiece()class
 	# def __repr__(self):
 	# 	return str(self.col) + "," + str(self.row) + "," + str(self.cur_space) + "," + str(self.team) + "," + str(self.type)
+
+
+	def add_en_pessant_move(self, x, y):
+		self.possible_moves_open.append(u.Vec2(x, y))
+		self.en_pessant_move.insert(0, u.Vec2(x, y))
+
+
 
 	def pawn_init_move_set_false(self) -> None:
 		self.init_move = False
@@ -231,6 +240,7 @@ class Pawn(Piece):
 
 	def determine_possible_moves(self, potential_spaces:list) -> None:
 
+		self.en_pessant_move = []
 		self.reset_possible_moves()
 
 		self.determine_possible_moves_straight_pawn(potential_spaces)
