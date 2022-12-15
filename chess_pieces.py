@@ -50,6 +50,7 @@ class Piece():
 		#else:
 		#	return str(self.col) + "," + str(self.row) + "," + str(self.cur_space) + "," + str(self.team)
 
+
 	def reset_possible_moves(self) -> None:
 		self.possible_moves_open = []
 		self.possible_moves_enemy = []

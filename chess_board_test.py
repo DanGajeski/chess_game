@@ -31,6 +31,7 @@ class Board():
 
 		self.en_pessant = False
 		self.en_pessant_coords = []#0index=x, 1index=init_y, 2index=final_y
+		self.check_mate_moves = []
 		
 		self.turn_zero = []
 		self.turn_one = []
@@ -114,7 +115,39 @@ class Board():
 		#if self.en_pessant == True and if self.living_list[piece_index].type == 'P' and if abs(self.living_list[piece_index].x - self.en_pessant[0]) == 1:
 		#you are kicking ass.  keep ignoring the lies in your head.  
 
+	
+
 	def move_piece_test(self, piece_index:int, x:int, y:int) -> None:
+		
+		def change_piece(piece_type:str, team:str) -> None:
+		#types: r(rook), n(knight), b(bishop), q(queen)
+			x = self.living_list[piece_index].vec.x 
+			y = self.living_list[piece_index].vec.y 
+			#del self.living_list[piece_index]
+			if piece_type == 'R':
+				self.living_list.append(Rook(u.Vec2(x, y), team))
+			elif piece_type == 'N':
+				self.living_list.append(Knight(u.Vec2(x, y), team))
+			elif piece_type == 'B':
+				self.living_list.append(Bishop(u.Vec2(x, y), team))
+			elif piece_type == 'Q':
+				self.living_list.append(Queen(u.Vec2(x, y), team))
+			del self.living_list[piece_index]
+
+		def pawn_promotion():
+			#FUCK THE LIES in MY HEAD.  FUCK THE LIES. 
+			#Daniel, you can do this.  That is all that matters.  
+			#The ocd, the intrusive thoughts in your head... They are lies. 
+			#You are extremely capable.   EXTREMELY CAPABLE. 
+			if self.living_list[piece_index].type == 'P':
+				if self.living_list[piece_index].team == 'blue':
+					if self.living_list[piece_index].vec.y == 7:
+						change_piece('Q', 'blue')
+				else:
+					if self.living_list[piece_index].vec.y == 0:
+						change_piece('Q', 'red')
+
+
 		self.en_pessant = False
 		self.en_pessant_coords = []
 		completed = False
@@ -132,15 +165,18 @@ class Board():
 				self.living_list[piece_index].vec.y = y
 				del self.living_list[index]
 				completed = True
+
+				pawn_promotion()
+
 				break
 		if completed == False:
-			if self.living_list[piece_index].type == 'P':
+			if self.living_list[piece_index].type == 'P': #pawn 2 space move
 				if abs(self.living_list[piece_index].vec.y - y) == 2 and self.living_list[piece_index].vec.x == x:
 					self.en_pessant = True
 					self.en_pessant_coords = [self.living_list[piece_index].vec.x, self.living_list[piece_index].vec.y, y]
 					self.living_list[piece_index].vec.x = x 
 					self.living_list[piece_index].vec.y = y 
-				elif u.Vec2(x, y) == self.living_list[piece_index].en_pessant_move[0]:
+				elif u.Vec2(x, y) == self.living_list[piece_index].en_pessant_move[0]: #pawn  en_pessant attack move
 					for index, piece in enumerate(self.living_list):
 						if self.living_list[piece_index].team == 'blue':
 							if u.Vec2(x, y-1) == piece.vec:
@@ -168,14 +204,38 @@ class Board():
 				else:
 					self.living_list[piece_index].vec.x = x 
 					self.living_list[piece_index].vec.y = y
+
+					pawn_promotion()
 			else:
 				self.living_list[piece_index].vec.x = x 
 				self.living_list[piece_index].vec.y = y 
+
+				pawn_promotion()
 
 		# if self.living_list[piece_index].type == 'P':
 		# 	if |self.living_list[piece_index].vec.y - y| == 2:
 		# 		self.en_pessant = True:
 		# 		self.en_pessant_coords = [self.living_list[piece_index].vec.x, self.living_list[piece_index].vec.y, y]
+
+	def check_for_check_mate(self, team:str):#team = 'blue': checks for red team possible moves
+		self.check_mate_moves = []
+		for piece in self.living_list:
+			if piece.team != team:
+				piece.determine_possible_moves()
+				self.check_mate_moves.append(piece.possible_moves_enemy)
+				#self.possible_moves_enemy
+		# for piece in self.living_list:
+		# 	if piece.team != team:
+		# 		self.check_mate_moves.append(piece.possible_moves_enemy)
+		for move in self.check_mate_moves:
+			for piece in self.living_list:
+				if piece.team == team and piece.type == 'K':
+					if move == piece.vec:
+						print('The king is under threat!  You must move your king or the end is near!')
+						break
+
+
+
 
 
 
