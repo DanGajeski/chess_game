@@ -30,8 +30,13 @@ class Vec2():
 		#return "Hello %s!" % self.x
 
 	def __eq__(self, other_vec:Vec2) -> Bool:
-		if self.x == other_vec.x and self.y == other_vec.y:
-			return True
+	#	if other_vec == None:
+	#		return False
+	#	return False
+		return other_vec is not None and self.x == other_vec.x and self.y == other_vec.y
+		#	return True
+		#else:
+	#		return False
 		# return True if self.x == other_vec.x and if self.y == other_vec.y
 
 	#def give_position(self) -> tuple:

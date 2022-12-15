@@ -128,6 +128,7 @@ class Board():
 	# 		self.living_list[piece_index].display_moves()
 		#if self.en_pessant == True and if self.living_list[piece_index].type == 'P' and if abs(self.living_list[piece_index].x - self.en_pessant[0]) == 1:
 		#you are kicking ass.  keep ignoring the lies in your head.  
+		#the lies will keep coming.  you will keep fighting them
 
 	
 
@@ -217,7 +218,7 @@ class Board():
 
 				#Selected Pawn Piece engaging in an EN_PESSANT_ATTACK
 
-				elif u.Vec2(x, y) == self.living_list[piece_index].en_pessant_move[0]: #pawn en_pessant attack move
+				elif u.Vec2(x, y) == self.living_list[piece_index].en_pessant_move: #pawn en_pessant attack move
 					for index, piece in enumerate(self.living_list):
 						if self.living_list[piece_index].team == 'blue':
 							if u.Vec2(x, y-1) == piece.vec:

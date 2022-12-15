@@ -73,8 +73,8 @@ fuck_2.select_piece_display_movements(0)
 #fuck_2.select_piece_determine_movements(1)
 #fuck_2.select_piece_display_movements(1)
 
-#fuck_2.move_piece_test(0, 1, 5)
-#fuck_2.display_board()
+fuck_2.move_piece_test(0, 1, 5)
+fuck_2.display_board()
 #don'tlistentothelies
 
 
