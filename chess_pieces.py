@@ -50,6 +50,8 @@ class Piece():
 		#else:
 		#	return str(self.col) + "," + str(self.row) + "," + str(self.cur_space) + "," + str(self.team)
 
+	#def name_tester(self) -> None:
+	#	print(self.__class__.__name__)
 
 	def reset_possible_moves(self) -> None:
 		self.possible_moves_open = []
@@ -176,7 +178,7 @@ class Pawn(Piece):
 	def determine_possible_moves_straight_pawn(self, potential_spaces:list) -> None:
 		#move_down, move_up, move_left, move_right
 
-		if  self.init_move == True:  #check multiple spaces in a row
+		if (self.team == 'blue' and self.vec.y == 1) or (self.team == 'red' and self.vec.y == 6):
 			first_index_found = False
 
 			for n in range(0, 2):

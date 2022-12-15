@@ -129,10 +129,9 @@ class TestPawn(unittest.TestCase):
 
 		self.assertEqual(u.Vec2(0,0), test_pawn_two.possible_moves_open[0])
 		self.assertEqual(u.Vec2(1,0), test_pawn_two.possible_moves_enemy[0])
-		self.assertEqual(u.Vec2(0,-1), test_pawn_two.impossible_moves_boundary[0])
 
 		potential_spaces = set_potential_spaces()
-		potential_spaces[0].set_space_closed("pawn", "red")#0,0
+		potential_spaces[0].set_space_closed("pawn", "red")#0,0`
 		potential_spaces[16].set_space_closed("pawn", "blue")#2,0
 					
 		test_pawn_three = chess_pieces.Pawn(u.Vec2(1,1),"red")
@@ -141,6 +140,20 @@ class TestPawn(unittest.TestCase):
 
 		self.assertEqual(u.Vec2(2,0), test_pawn_three.possible_moves_enemy[0])
 		self.assertEqual(u.Vec2(1,0), test_pawn_three.possible_moves_open[0])
+
+		potential_spaces = set_potential_spaces()
+		test_pawn_four = chess_pieces.Pawn(u.Vec2(0,1),"blue")
+		test_pawn_four.determine_possible_moves(potential_spaces)
+		self.assertEqual(u.Vec2(0,2), test_pawn_four.possible_moves_open[0])
+		self.assertEqual(u.Vec2(0,3), test_pawn_four.possible_moves_open[1])
+
+		potential_spaces = set_potential_spaces()
+		test_pawn_five = chess_pieces.Pawn(u.Vec2(0,2),"blue")
+		test_pawn_five.determine_possible_moves(potential_spaces)
+		self.assertEqual(u.Vec2(0,3), test_pawn_five.possible_moves_open[0])
+
+
+
 
 class TestKing(unittest.TestCase):
 	def test_determine_possible_moves(self):

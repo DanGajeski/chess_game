@@ -54,23 +54,51 @@ fuck_2.set_open_closed_spaces()
 #fuck_2.display_board()
 fuck_2.list_active_pieces()
 fuck_2.move_piece_test(0, 0, 4)
+fuck_2.set_open_closed_spaces()
 #fuck_2.display_board()
 #print(fuck_2.en_pessant)
+#print(fuck_2.en_pessant)
+#print(fuck_2.en_pessant_coords)
 fuck_2.move_piece_test(17, 1, 4)
+fuck_2.set_open_closed_spaces()
 fuck_2.display_board()
+
 print(fuck_2.en_pessant)
 print(fuck_2.en_pessant_coords)
+
+fuck_2.select_piece_determine_movements(0)
 fuck_2.select_piece_display_movements(0)
-fuck_2.move_piece_test(0, 1, 5)
-fuck_2.display_board()
+
 #fuck_2.list_active_pieces()
-fuck_2.move_piece_test(23, 0, 5)
-fuck_2.display_board()
-fuck_2.move_piece_test(0, 1, 6)
-fuck_2.display_board()
-fuck_2.move_piece_test(0, 1, 7)
-fuck_2.display_board()
+#fuck_2.select_piece_determine_movements(1)
+#fuck_2.select_piece_display_movements(1)
+
+#fuck_2.move_piece_test(0, 1, 5)
+#fuck_2.display_board()
+#don'tlistentothelies
+
+
+
+
+
+
+
+#fuck_2.select_piece_display_movements(0)
+#fuck_2.move_piece_test(0, 1, 5)
+#fuck_2.display_board()
+
 #fuck_2.list_active_pieces()
+
+#fuck_2.move_piece_test(23, 0, 5)
+#fuck_2.display_board()
+
+#fuck_2.move_piece_test(0, 1, 6)
+#fuck_2.display_board()
+
+#fuck_2.move_piece_test(0, 1, 7)
+#fuck_2.display_board()
+#fuck_2.list_active_pieces()
+#fuck_2.living_list[0].name_tester()
 
 
 #fuck_2.collect_them_all()
