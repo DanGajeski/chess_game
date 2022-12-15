@@ -8,14 +8,14 @@ class Vec2():
 		#self.xy = (self.x, self.y)
 
 	def __add__(self, other_vec:Vec2) -> Vec2:
-		x = self.x + other_vec.x
-		y = self.y + other_vec.y 
-		return Vec2(x, y)
+		#x = self.x + other_vec.x
+		#y = self.y + other_vec.y 
+		return Vec2(self.x + other_vec.x, self.y + other_vec.y)
 
 	def __sub__(self, other_vec:Vec2) -> Vec2:
-		x = self.x - other_vec.x
-		y = self.y - other_vec.y 
-		return Vec2(x, y)
+		#x = self.x - other_vec.x
+		#y = self.y - other_vec.y 
+		return Vec2(self.x - other_vec.x, self.y - other_vec.y)
 
 	def __mul__(self, scalar:float) -> Vec2:
 		return Vec2(self.x * scalar, self.y * scalar)
@@ -33,7 +33,7 @@ class Vec2():
 	#	if other_vec == None:
 	#		return False
 	#	return False
-		return other_vec is not None and self.x == other_vec.x and self.y == other_vec.y
+		return other_vec is not None and self.x == other_vec.x and self.y == other_vec.y 
 		#	return True
 		#else:
 	#		return False
