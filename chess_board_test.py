@@ -7,8 +7,10 @@ import utils as u
 class Board():
 
 	def __init__(self):
-		self.rows = 8
-		self.cols = 8
+		#self.y_rows = 8
+		#self.x_cols = 8
+		self.y_rows = 8
+		self.x_cols = 8
 		
 		###
 		# self.blue_pawns = []
@@ -26,16 +28,15 @@ class Board():
 		# self.red_king = []
 		###
 		self.living_list = []
-		self.dead_list =[]#move dead pieces here?
+		self.dead_list_blue = []#move dead pieces here?
+		self.dead_list_red = []
 		self.dead_index = 0
 
 		self.en_pessant = False
 		self.en_pessant_coords = []#location of en_pessant piece
 		self.check_mate_moves = []
 		
-		self.turn_zero = []
-		self.turn_one = []
-		self.turn_two = []#...saving turns in lists? 
+		self.turns = [[]]#each turn saved in a list within self.turns? 
 
 		self.potential_spaces = []  #set_potential_spaces to fill with u.Space objects
 
@@ -46,7 +47,7 @@ class Board():
 
 		set_potential_spaces()
 
-	def set_open_closed_spaces(self):
+	def set_open_closed_spaces(self) -> None:#used after every movement to update piece location on board
 		for space in self.potential_spaces:
 			space.closed_this_turn = False
 		for space in self.potential_spaces:
@@ -58,17 +59,17 @@ class Board():
 			if space.closed_this_turn == False:
 				space.set_space_open()
 
-	def print_spaces_for_test(self):
+	def print_spaces_for_test(self) -> None:#TESTING_METHOD
 		for space in self.potential_spaces:
 			print(space)
-	def print_dead_for_test(self):
+	def print_dead_for_test(self) -> None:#TESTING_METHOD
 		for dead_piece in self.dead_list:
 			print(dead_piece)
-	def list_active_pieces(self) -> None:
+	def list_active_pieces(self) -> None:#TESTING_METHOD
 		for index, piece in enumerate(self.living_list):
 			print("{}: {}".format(index, piece))
 
-	def select_piece_determine_movements(self, piece_index) -> None:
+	def select_piece_determine_movements(self, piece_index) -> None:#determines all possible moves for selected Piece
 		if self.en_pessant == True and self.living_list[piece_index].type == 'P' and abs(self.living_list[piece_index].vec.x - self.en_pessant_coords[0]) == 1 and self.living_list[piece_index].vec.y == self.en_pessant_coords[1]: #y value abs ADD
 			self.living_list[piece_index].determine_possible_moves(self.potential_spaces)
 			if self.living_list[piece_index].team == 'blue':
@@ -78,18 +79,15 @@ class Board():
 		else:
 			self.living_list[piece_index].determine_possible_moves(self.potential_spaces)
 
-	##MOVED TO DISPLAY METHODS##
-	# def select_piece_display_movements(self, piece_index) -> None:
-	# 	self.living_list[piece_index].display_moves()
-
-	def reset_en_pessant(self) -> None:
+	def reset_en_pessant(self) -> None:#resets en_pessant board attributes for tracking  en_pessant movements
 		self.en_pessant = False
 		self.en_pessant_coords = []
 
-		#piece_index possible variable name change to 'selected_piece'? 
-	def move_piece_test(self, selected_piece:int, x:int, y:int) -> None:
+	#UPDATE_REQUEST - update method to select piece via coords instead of list index
+	def move_piece(self, selected_piece:int, x:int, y:int) -> None:#strong method used for moving a Piece AFTER Piece movements determined by [Board.select_piece_determine_movements() method]
 		
-		def change_piece(updated_piece_type:str) -> None:
+		#UPDATE_REQUEST_01(on_hold) - update to include user input selecting which Piece to morph into
+		def change_piece(updated_piece_type:str) -> None:#morphs Pawn Piece into a new Piece(Q,N,B,R)
 			x = self.living_list[selected_piece].vec.x 
 			y = self.living_list[selected_piece].vec.y
 			team = self.living_list[selected_piece].team
@@ -103,43 +101,48 @@ class Board():
 				self.living_list.append(Rook(u.Vec2(x, y), team))
 			del self.living_list[selected_piece]
 
-			#WILL CHANGE FOR USER INPUT#
-			#possible method name change to 'check_pawn_promotion()'
-		def pawn_promotion():
+		#WILL CHANGE FOR USER INPUT#
+		def check_pawn_promotion() -> None:#cond for Pawn Piece change [Board.change_piece() method]
 			if self.living_list[selected_piece].type == 'P':
 				if self.living_list[selected_piece].team == 'blue':
 					if self.living_list[selected_piece].vec.y == 7:
-						change_piece('q')
+						change_piece('q')#CHANGE_01
 				else:
 					if self.living_list[selected_piece].vec.y == 0:
-						change_piece('q')
+						change_piece('q')#CHANGE_01
 
-		def just_move(x:int, y:int) -> None:
+		def just_move(x:int, y:int) -> None:#move Piece to new location
 			self.living_list[selected_piece].vec.x = x  
 			self.living_list[selected_piece].vec.y = y 
 
-		def kill_and_move(index:int, x:int, y:int) -> None:
-			self.dead_list.append(self.living_list[index])
-			self.living_list[index].vec.x = self.dead_index - 1
-			self.living_list[index].vec.y = self.dead_index - 1
-			self.dead_index -= 1
-			just_move(x, y)
-			del self.living_list[index]
+		def kill_and_move(index:int, x:int, y:int) -> None:#move Piece to target location and delete occupying Piece in target location / moves deleted Piece into respective color dead_list
+			if self.living_list[index].team == 'blue':
+				self.dead_list_blue.append(self.living_list[index])
+				self.living_list[index].vec.x = self.dead_index - 1
+				self.living_list[index].vec.y = self.dead_index - 1
+				self.dead_index -= 1
+				just_move(x, y)
+				del self.living_list[index]
+			elif self.living_list[index].team == 'red':
+				self.dead_list_red.append(self.living_list[index])
+				self.living_list[index].vec.x = self.dead_index - 1
+				self.living_list[index].vec.y = self.dead_index - 1
+				self.dead_index -= 1
+				just_move(x, y)
+				del self.living_list[index]
 
-		piece_attacked = False
+		piece_attacked = False #cond bool for Piece being directly replaced with opposite color Piece
 
-		#checks piece_index(currently selected) Piece against every active Piece in self.living_list, IF another Piece already in location, 'kill' it from self.living_list and move active Piece into dead Piece's xy coords 
+		#checks selected_piece Piece against every active Piece in self.living_list, IF another Piece already in location, 'kill' it from self.living_list and move active Piece into dead Piece's xy coords 
 		for index, piece in enumerate(self.living_list):
 			if self.living_list[index].vec.x == x and self.living_list[index].vec.y == y:
-				
 				kill_and_move(index, x, y)
 				piece_attacked = True
-				pawn_promotion()
+				check_pawn_promotion()
 				self.reset_en_pessant()
 				break
 
-		#Piece yet unmoved due to no Pieces to kill at destination	
-		if piece_attacked == False:
+		if piece_attacked == False:#Piece yet unmoved due to no Pieces to kill at destination(will be moved in subsequent code)
 			if self.living_list[selected_piece].type == 'P': 
 
 				#Pawn Piece moving 2 spaces from origin enabling EN_PESSANT opportunity for next player's turn.
@@ -156,34 +159,28 @@ class Board():
 								kill_and_move(index, x, y)
 								self.reset_en_pessant()
 								break
-						else:
+						else:#'red'
 							if u.Vec2(x, y+1) == piece.vec:
 								kill_and_move(index, x, y)
 								self.reset_en_pessant()
 								break
 				
-				#Pawn Piece moving to EMPTY location
-				else:
+				else:#Pawn Piece moving to EMPTY location
 					just_move(x, y)
 					self.reset_en_pessant()
-					pawn_promotion()
-
-			#NON-Pawn Piece moving to EMPTY location		
-			else:
+					check_pawn_promotion()
+	
+			else:#NON-Pawn Piece moving to EMPTY location
 				just_move(x, y)
 				self.reset_en_pessant()
-				pawn_promotion()
 
+	#NEEDS_TESTING + INTEGRATION
 	def check_for_check_mate(self, team:str):#team = 'blue': checks for red team possible moves
 		self.check_mate_moves = []
 		for piece in self.living_list:
 			if piece.team != team:
 				piece.determine_possible_moves()
 				self.check_mate_moves.append(piece.possible_moves_enemy)
-				#self.possible_moves_enemy
-		# for piece in self.living_list:
-		# 	if piece.team != team:
-		# 		self.check_mate_moves.append(piece.possible_moves_enemy)
 		for move in self.check_mate_moves:
 			for piece in self.living_list:
 				if piece.team == team and piece.type == 'K':
@@ -191,93 +188,7 @@ class Board():
 						print('The king is under threat!  You must move your king or the end is near!')
 						break
 
-
-
-
-
-
-
-
-
-	#checked possible moves 
-	# current move verified, space verified to be currently closed
-
-	# previous claimed space made empty
-
-	# piece in destination space deleted
-	# selected piece location chagned to destination space
-	#def move_to_closed_space(self):
-
-		# Check state / board parameters then check piece paremeters. 
-
-	# previous claimed space made empty
-
-	# selected piece location changed to destination space
-	#def move_to_open_space(self):
-
-	###XXXMOVEMENTMETHODSXXX###
-
-	###PAWNMOVEMENTS###
-	
-	#you are worth something real.
-
-	###ROOKMOVEMENTS###
-	###KNIGHTMOVEMENTS###
-	###BISHOPMOVEMENTS###
-	###QUEENMOVEMENTS###
-	###KINGMOVEMENTS###
-
-
-	###XXXDISPLAY METHODSXXX###
-
-	def select_piece_display_movements(self, piece_index) -> None:
-		self.living_list[piece_index].display_moves()
-
-	def print_chessboard_rows_lmr(self, fuck, c, r):
-
-		def will_this_fuckin_work(c, r):
-			
-			symbol = " "
-			for d in range(len(self.living_list)):
-				if c == self.living_list[d].vec.x and r == self.living_list[d].vec.y:
-					symbol = self.living_list[d].type
-			return symbol
-
-		if fuck == 'l':
-			
-			symbol = will_this_fuckin_work(c, r)
-			print("||__(%s)_" % symbol, end='')
-
-		elif fuck == 'r':
-			
-			symbol = will_this_fuckin_work(c, r)
-			print("_(%s)__||" % symbol, end='')		
-
-		elif fuck == 'm':
-			
-			symbol = will_this_fuckin_work(c, r)	
-			print("_(%s)_" % symbol, end='')
-
-	def display_board(self):
-		
-		for r in range(self.rows):
-			#print("ROW: %d ||" % r, end='')
-			for c in range(self.cols):
-				if c == 0:
-					self.print_chessboard_rows_lmr('l', c, r)
-				
-				elif c == self.cols - 1:
-					self.print_chessboard_rows_lmr('r', c, r)	
-
-				else:
-					self.print_chessboard_rows_lmr('m', c, r)
-
-			print("\n")
-
-	###XXXINITIALIZEREDANDBLUETEAMS_ADDTOself.livinglistXXX###
-
-	def initialize_both_teams(self):
-		
+	def initialize_both_teams(self) -> None:#Initializes both 'red' and 'blue' teams according to their respective starting Vec2 coords
 		for n in range(0,8):
 			self.living_list.append(Pawn(u.Vec2(n,1),"blue"))
 		self.living_list.append(Knight(u.Vec2(1,0),"blue"))
@@ -299,216 +210,40 @@ class Board():
 		self.living_list.append(Bishop(u.Vec2(5,7),"red"))
 		self.living_list.append(Queen(u.Vec2(3,7),"red"))
 		self.living_list.append(King(u.Vec2(4,7),"red"))
-
-
-
-		# def initialize_blue_team():
-
-
-			
-
-
-			# def initialize_blue_pawns():
-			# 		#self.blue_pawns[n].set_location().shit_my_pants() Method chaining - .set_location() would have to return self
-			# def initialize_blue_knights():
-			# 	#self.blue_knights.append(Knight(1, 2))
-			# 	#self.blue_knights.append(Knight(1, 7))
-			# def initialize_blue_rooks():
-			# def initialize_blue_bishops():
-			# def initialize_blue_queen():
-			# def initialize_blue_king():
-
-			# initialize_blue_pawns()
-			# initialize_blue_knights()
-			# initialize_blue_rooks()
-			# initialize_blue_bishops()
-			# initialize_blue_queen()
-			# initialize_blue_king()
-
-		# def initialize_red_team():
-
-			
-
-
-			# def initialize_red_pawns():
-			# def initialize_red_knights():
-			# def initialize_red_rooks():
-			# def initialize_red_bishops():
-			# def initialize_red_queen():
-			# def initialize_red_king():
-				
-			# initialize_red_pawns()
-			# initialize_red_knights()
-			# initialize_red_rooks()
-			# initialize_red_bishops()
-			# initialize_red_queen()
-			# initialize_red_king()
-
-		# def collect_them_all():
-
-		# 	def collector(collect_from):
-		# 		for n in range(len(collect_from)):
-		# 			self.living_list.append(collect_from[n])
-
-			#for n in self.blue_team:
-
-		# 	collector(self.blue_pawns)
-		# 	collector(self.blue_knights)
-		# 	collector(self.blue_rooks)
-		# 	collector(self.blue_bishops)
-		# 	collector(self.blue_queen)
-		# 	collector(self.blue_king)
-
-		# 	collector(self.red_pawns)
-		# 	collector(self.red_knights)
-		# 	collector(self.red_rooks)
-		# 	collector(self.red_bishops)
-		# 	collector(self.red_queen)
-		# 	collector(self.red_king)
-
-		# initialize_blue_team()
-		# initialize_red_team()
-		# collect_them_all()
-
-		# moves piece from (c,r) to (nc, nr) and if (nc, nr) already occup. deletes occupying piece
 	
-	# def move_piece_test(self, c, r, nc, nr):
-	# 	piece_del_index = -1
-	# 	for test_piece in range(len(self.living_list)):
-	# 		if self.living_list[test_piece].vec.x == c and self.living_list[test_piece].vec.y == r:
+	#you are worth something real.
 
-	# 			for test_piece_two in range(len(self.living_list)):
+	###XXXDISPLAY METHODSXXX###
 
+	def select_piece_display_movements(self, piece_index:int) -> None:#displays to user the selected Piece's possible movements as Vec2 coords
+		self.living_list[piece_index].display_moves()
 
+	def display_board(self):#determines which self.living_list[] Piece symbols to print and where, then prints entire board to user screen
 
+		def determine_and_print_displayed_symbol(x:int, y:int) -> None:#determines symbol to print according to self.living_list[] object Vec2s
+			unformatted_symbol = " "
+			for piece in self.living_list:
+				if x == piece.vec.x and y == piece.vec.y:
+					unformatted_symbol = piece.type
+					break
+			if x == 0:
+				symbol = '||__(%s)_' % unformatted_symbol
+			elif x == self.x_cols - 1:
+				symbol = '_(%s)__||' % unformatted_symbol
+			else:
+				symbol = '_(%s)_' % unformatted_symbol
+			print(symbol, end='')
 
-
-	# 				if self.living_list[test_piece_two].vec.x == nc and self.living_list[test_piece_two].vec.y == nr:
-
-	# 					piece_del_index = test_piece_two 
-
-	# 			self.living_list[test_piece].vec.x = nc 
-	# 			self.living_list[test_piece].vec.y = nr
-	# 			#self.living_list[test_piece].vec.xy = (nc, nr)
-
-	# 	if piece_del_index >= 0:
-	# 		del self.living_list[piece_del_index]
-
-	# def piece_movement_logic
-
-	# what kind of piece are we using
-	# piece.__class__.__name__ to get type
-	# if rook:
-	# 	we check each list, in order, FOR: potential_spaces 
-	# 									   open_spaces optional_space 
-	# 									   if closed_spaces:  (do not check any further)
-	# 									     Ally: non_optional_space
-	# 									     enemy: optional_space(set to optional_space and attack_space lists) (claim space, del enemy from show list)  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	###PAWNTURNINCREMENTFUNCS((()))
-
-	# def increment_ll_red_pawns_turn(self):
-	# 	for wk_piece in self.living_list:
-	# 		if wk_piece.team == "red" and wk_piece.type == 'P':
-	# 			wk_piece.init_turn += 1
-
-	# def increment_ll_blue_pawns_turn(self):
-	# 	for piece in self.living_list:
-	# 		if piece.team == "blue" and piece.type == 'P':
-	# 			piece.init_turn += 1
-
-
-#living_list[]
-
-	# SPACES
-	#	OPEN SPACE
-	#	CLAIMED SPACE
-	#		WHO IS CLAIMING SPACE
-	
-	##	THREATENED SPACES ( OPEN SPACES WHICH ARE IN MOVING DISTANCE OF APPLICABLE PIECES )
-			# ping all remaining Piece objects, check for potential moves.   find ALL open spaces
-			#	which are potential move locations
-				# self.possible_move_locations = [(n,y),]... with a Piece class method to find this. 
-					# dont listen to the lies in your head.  you've come this far.  you've worked this hard
-					# you can keep going.  you can rest recoup and work harder.  You've got this.  Caps even. 
-
-	# MOVING
-	#	WHERE CAN PIECE TYPE MOVE TO
-	#		OUT OF POSSIBLE SPACES TO MOVE TO - IS SPACE OPEN OR CLAIMED
-	#	IF OPEN
-	#		PIECE CLAIMS OPEN SPACE, PREVIOUS CLAIMED SPACE NOW BECOMES OPEN SPACE
-	#	IF CLAIMED
-	#		PIECE CLAIMS CLAIMED SPACE, PREVIOUS CLAIMED SPACE NOW BECOMES OPEN SPACE
-	#		PREVIOUS CLAIMING PIECE GETS DESTROYED, COMPLETELY REMOVED FROM THE BOARD
-
-	# ADV MOVING
-	#	ROOK, QUEEN, BISHOP all move in a certain direction
-
-	##	THREATENED SPACES ( OPEN SPACES WHICH ARE IN MOVING DISTANCE OF APPLICABLE PIECES  )
-			# ping all remaining Piece objects, check for potential moves.   find ALL open spaces
-			#	which are potential move locations
-
-
-
-
-	# def get_map_locations(self):
-	# 	for n in self.living_list:
-	# 		if n.type == "pawn":
-	# 			self.current_locations.append(["p", n.board_location])
-			#if n.type == "rook":
-
-
-
-
-	#def set_pawns_locations(self):
-	#	for pawn in blue_pawns:
-	#		pawn.set_location()
-
-
-	#def initialize_blue_rooks(self):
-	#def initialize_blue_knights(self):
-	#def initializa_blue_bishops(self):
-	#def initializa_blue_queen(self):
-	#def initializa_blue_king(self):
-
-	#def initialize_red_pawns(self):
-	#def initialize_red_rooks(self):
-	#def initialize_red_knights(self):
-	#def initializa_red_bishops(self):
-	#def initializa_red_queen(self):
-	#def initializa_red_king(self):
-
-#### NEXT STEPS
-#Write method for moving when a HOPPER
-	#PAWN, KNIGHT, KING
-#Write method for moving when a GLIDER
-	#QUEEN, BISHOP, ROOK
-
-#CheckforCheckmateCheck....Checkkkkkkyougotthis
-#if king possible moves are all in threatened_moves... checkmate!
+		y_reference_num = 8
+		print("      A    B    C    D    E    F    G    H")
+		for y in range(self.y_rows):#prints entire board and assigned symbols
+			print(y_reference_num, end='')
+			for x in range(self.x_cols):
+				determine_and_print_displayed_symbol(x, y)
+			print(y_reference_num, end='')
+			y_reference_num -= 1
+			if y != self.y_rows - 1:
+				print("\n")
+			else:
+				print("\n", end='')
+		print("      A    B    C    D    E    F    G    H")
