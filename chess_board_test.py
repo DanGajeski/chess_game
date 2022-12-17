@@ -11,7 +11,9 @@ class Board():
 		#self.x_cols = 8
 		self.y_rows = 8
 		self.x_cols = 8
-		
+		self.blue_turn = 1
+		self.red_turn = 0
+
 		###
 		# self.blue_pawns = []
 		# self.blue_rooks = []
@@ -84,8 +86,26 @@ class Board():
 		self.en_pessant_coords = []
 
 	#UPDATE_REQUEST - update method to select piece via coords instead of list index
-	def move_piece(self, selected_piece:int, x:int, y:int) -> None:#strong method used for moving a Piece AFTER Piece movements determined by [Board.select_piece_determine_movements() method]
-		
+	#def move_piece(self, selected_piece:int, x:int, y:int) -> None:#strong method used for moving a Piece AFTER Piece movements determined by [Board.select_piece_determine_movements() method]
+	def move_piece(self, selected_piece:int) -> None:#strong method used for moving a Piece AFTER Piece movements determined by [Board.select_piece_determine_movements() method]	
+		x = 0
+		y = 0
+		possible_characters = 'abcdefgh'
+		active_piece = input("Please select destination to move to: (ex: 'd5')")
+
+		x = possible_characters.find(active_piece[0])
+		y = 8 - int(active_piece[1])
+
+
+		def increment_turn() -> None:
+			if self.blue_turn == 1:
+				self.blue_turn = 0
+				self.red_turn = 1
+			else:
+				self.blue_turn = 1
+				self.red_turn = 0
+
+
 		#UPDATE_REQUEST_01(on_hold) - update to include user input selecting which Piece to morph into
 		def change_piece(updated_piece_type:str) -> None:#morphs Pawn Piece into a new Piece(Q,N,B,R)
 			x = self.living_list[selected_piece].vec.x 
@@ -137,6 +157,7 @@ class Board():
 		for index, piece in enumerate(self.living_list):
 			if self.living_list[index].vec.x == x and self.living_list[index].vec.y == y:
 				kill_and_move(index, x, y)
+				increment_turn()
 				piece_attacked = True
 				check_pawn_promotion()
 				self.reset_en_pessant()
@@ -150,6 +171,7 @@ class Board():
 					self.en_pessant = True
 					self.en_pessant_coords = [x,y]
 					just_move(x, y)
+					increment_turn()
 
 				#Selected Pawn Piece engaging in an EN_PESSANT_ATTACK
 				elif u.Vec2(x, y) == self.living_list[selected_piece].en_pessant_move: #pawn en_pessant attack move
@@ -157,21 +179,25 @@ class Board():
 						if self.living_list[selected_piece].team == 'blue':
 							if u.Vec2(x, y-1) == piece.vec:
 								kill_and_move(index, x, y)
+								increment_turn()
 								self.reset_en_pessant()
 								break
 						else:#'red'
 							if u.Vec2(x, y+1) == piece.vec:
 								kill_and_move(index, x, y)
+								increment_turn()
 								self.reset_en_pessant()
 								break
 				
 				else:#Pawn Piece moving to EMPTY location
 					just_move(x, y)
+					increment_turn()
 					self.reset_en_pessant()
 					check_pawn_promotion()
 	
 			else:#NON-Pawn Piece moving to EMPTY location
 				just_move(x, y)
+				increment_turn()
 				self.reset_en_pessant()
 
 	#NEEDS_TESTING + INTEGRATION
@@ -220,30 +246,67 @@ class Board():
 
 	def display_board(self):#determines which self.living_list[] Piece symbols to print and where, then prints entire board to user screen
 
-		def determine_and_print_displayed_symbol(x:int, y:int) -> None:#determines symbol to print according to self.living_list[] object Vec2s
+		def determine_displayed_symbol(x:int, y:int) -> str:#determines symbol to print according to self.living_list[] object Vec2s
 			unformatted_symbol = " "
 			for piece in self.living_list:
 				if x == piece.vec.x and y == piece.vec.y:
 					unformatted_symbol = piece.type
 					break
-			if x == 0:
-				symbol = '||__(%s)_' % unformatted_symbol
-			elif x == self.x_cols - 1:
-				symbol = '_(%s)__||' % unformatted_symbol
-			else:
-				symbol = '_(%s)_' % unformatted_symbol
-			print(symbol, end='')
+			return "_(%s)_" % unformatted_symbol
 
 		y_reference_num = 8
-		print("      A    B    C    D    E    F    G    H")
+		x_reference_spaced_chars = "      A    B    C    D    E    F    G    H"
+		print(x_reference_spaced_chars)
 		for y in range(self.y_rows):#prints entire board and assigned symbols
 			print(y_reference_num, end='')
+			print("||_", end='')
 			for x in range(self.x_cols):
-				determine_and_print_displayed_symbol(x, y)
+				print(determine_displayed_symbol(x, y), end='')
+			print("_||", end='')
 			print(y_reference_num, end='')
 			y_reference_num -= 1
 			if y != self.y_rows - 1:
 				print("\n")
 			else:
 				print("\n", end='')
-		print("      A    B    C    D    E    F    G    H")
+		print(x_reference_spaced_chars)
+
+	def player_select_piece(self):
+		active_piece_x = 0
+		active_piece_y = 0
+		active_piece_living_list_index = 0
+		possible_characters = 'abcdefgh'
+		active_color_piece_in_living_list = False
+
+		if self.blue_turn == 1:
+			active_piece = input("Blue player, please select a Piece to move: (ex: 'd5')")
+		else:
+			active_piece = input("Red player, please select a Piece to move: (ex: 'd5')")
+		while active_color_piece_in_living_list == False:
+
+			
+			active_piece_x = possible_characters.find(active_piece[0])
+			active_piece_y = 8 - int(active_piece[1])
+			found_match = False
+
+
+			for index, piece in enumerate(self.living_list):
+				#print(self.blue_turn, piece.team, piece.vec.x, piece.vec.y, active_piece_x, active_piece_y)
+				if self.blue_turn == 1 and piece.team == 'blue' and piece.vec.x == active_piece_x and piece.vec.y == active_piece_y:
+					active_color_piece_in_living_list = True
+					found_match = True
+					active_piece_living_list_index = index 
+					break
+				elif self.red_turn == 1 and piece.team == 'red' and piece.vec.x == active_piece_x and piece.vec.y == active_piece_y:
+					active_color_piece_in_living_list = True
+					found_match = True 
+					active_piece_living_list_index = index 
+					break
+	
+			if found_match == False and self.blue_turn == 1:
+				active_piece = input("That piece either doesn't exist or isn't on your team.  Blue player, please select a Piece to move: (ex: 'd5')")
+			elif found_match == False and self.red_turn == 1:
+				active_piece = input("That piece either doesn't exist or isn't on your team.  Red player, please select a Piece to move: (ex: 'd5')")
+
+		return active_piece_living_list_index
+		#print(active_piece_living_list_index)

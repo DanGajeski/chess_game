@@ -126,14 +126,34 @@ class Piece():
 			self.impossible_moves_boundary.append(cur_move)
 
 	def display_moves(self) -> None:
+		formatted_moves = []
+		def convert_from_vec2_to_chess_reference_id(formatted_moves:list, movement:Vec2) -> None:
+			#formatted_moves = []
+			possible_characters = '0a1b2c3d4e5f6g7h'
+			x_reference_char = possible_characters.find(str(movement.x)) + 1
+			y_reference_num = 8 - movement.y
+			formatted_moves.append(possible_characters[x_reference_char] + str(y_reference_num))
+			return formatted_moves
+		#formatted_moves = []
+		#possible_characters = '0a1b2c3d4e5f6g7h'
 		for movement in self.possible_moves_open:
-			print(movement)
+			formatted_moves = convert_from_vec2_to_chess_reference_id(formatted_moves, movement)
+			# x_reference_char = possible_characters.find(str(movement.vec.x)) + 1
+			# y_reference_num = 8 - movement.vec.y
+			# formatted_moves.append(x_reference_char + str(y_reference_num))
 		for movement in self.possible_moves_enemy:
-			print(movement)
+			formatted_moves = convert_from_vec2_to_chess_reference_id(formatted_moves, movement)
+			# x_reference_char = possible_characters.find(str(movement.vec.x)) + 1
+			# y_reference_num = 8 - movement.vec.y
+			# formatted_moves.append(x_reference_char + str(y_reference_num))
+		for move in formatted_moves:
+			print(move)
 
-	def move_piece(self, x:int, y:int) -> None:
-		self.vec.x = x 
-		self.vec.y = y   
+
+
+	#def move_piece(self, x:int, y:int) -> None:
+	#	self.vec.x = x 
+	#	self.vec.y = y   
 
 
 
