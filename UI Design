@@ -1,0 +1,51 @@
+UI Design
+
+Fixed Side UI 80character wide 20lines tall
+
+
+current_player
+selected_piece
+title_game
+quit_options
+save_options
+taunt_button
+status_message_showing_last_move
+dead_piece_list(icons?)(per-team)
+turn_timer
+
+
+
+-keyboard arrow key selection, enter to select (1st state) -- highlights potential moves, arrow key to move(2nd state) then enter to execute
+(should be able to "back-up" a state, ie. return to Piece selection after having already selected a Piece)
+
+(VICTORY/DEFEAT Screen.   + Continue / Quit screen afterwards)
+(Mouse may not be available for all systems - if available... set primary buttons to be clickable)
+________________________________________________________________________________
+F8(Game_menu)    FUCKIN CHESS		('esc' to one-up)	    Player Turn             Game_menu - goes to new screen with:
+		         										   Turn # / timer           save_options
+      A    B    C    D    E    F    G    H        B                           R     quit_options                                                                                                 
+8||__(R)__(T)__(B)__(Q)__(K)__(B)__(T)__(R)__||8  _                           _     send_a_taunt_option -upon next player's turn, show taunt-screen                                                                                                
+                                                 |P|                         | |    exit_game_menu_option ('esc' again)                                                                                
+7||__(P)__(P)__(P)__(P)__(P)__(P)__(P)__(P)__||7 |p|                         | |                                                                                                         
+                                                 |p|      Selected-Piece     | |  (updates as you move the 'cursor' over pieces)                                                                                                         
+6||__( )__( )__( )__( )__( )__( )__( )__( )__||6 |p|                         | |               ('locks-in' after selecting piece)                                                                                           
+                                                 |p|      Destination        | |  (updates as you move the 'cursor' over pieces)                                                                                                       
+5||__( )__( )__( )__( )__( )__( )__( )__( )__||5 |p|                         | |               ('locks-in' after selecting piece)                                                                                          
+                                                 |p|      Pawn Upgrade!      | |                                                                                                         
+4||__( )__( )__( )__( )__( )__( )__( )__( )__||4 |p|      Q   R   N   B      | | <- Show pawn/change selection options here when pawn reaches end                                                                                                        
+                                                 |R|                         | |     After user selects Piece to move and destination to move to:                                                                                                     
+3||__( )__( )__( )__( )__( )__( )__( )__( )__||3 |T|  "Blue Pawn from a7..." | |     Display Move parameters and wait x seconds before executing and moving to next turn                                                                                                    
+                                                 |B| "...to red queen at b6" | |     import time -> time.sleep()...                                                                                                    
+2||__(P)__(P)__(P)__(P)__(P)__(P)__(P)__(P)__||2 |Q|  after x turn seconds   | |     show '3...' '2...' '1...' -> execute move                                                                                                    
+                                                 |K|                         | |                                                                                                         
+1||__(R)__(T)__(B)__(Q)__(K)__(B)__(T)__(R)__||1 |B|       			     | |                                                                                                         
+      A    B    C    D    E    F    G    H       |T|                         | |
+_________________________________________________|R|____ last move display___|_|
+
+														(dead piece holder, different x-pos, in curses...)
+ 
+
+
+
+
+

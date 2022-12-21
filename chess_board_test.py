@@ -1,3 +1,6 @@
+#goto L288
+#goto L116
+
 # 0 Based Indexing EVERYWHEREWEEREWREWRWERWEREWR you've got this even when you think you don't.  
 # DDont believee the liES in your MiNd
 from __future__ import annotations
@@ -11,8 +14,9 @@ class Board():
 		#self.x_cols = 8
 		self.y_rows = 8
 		self.x_cols = 8
-		self.blue_turn = 1
-		self.red_turn = 0
+		self.blue_turn = 0
+		self.red_turn = 1
+		self.current_player = ''
 
 		###
 		# self.blue_pawns = []
@@ -85,9 +89,19 @@ class Board():
 		self.en_pessant = False
 		self.en_pessant_coords = []
 
+	def increment_turn(self) -> None:
+		if self.blue_turn == 1:
+			self.blue_turn = 0
+			self.red_turn = 1
+			self.current_player = 'red'
+		else:
+			self.blue_turn = 1
+			self.red_turn = 0
+			self.current_player = 'blue'
+
 	#UPDATE_REQUEST - update method to select piece via coords instead of list index
 	#def move_piece(self, selected_piece:int, x:int, y:int) -> None:#strong method used for moving a Piece AFTER Piece movements determined by [Board.select_piece_determine_movements() method]
-	def move_piece(self, selected_piece:int) -> None:#strong method used for moving a Piece AFTER Piece movements determined by [Board.select_piece_determine_movements() method]	
+	def move_piece(self, selected_piece:str) -> None:#strong method used for moving a Piece AFTER Piece movements determined by [Board.select_piece_determine_movements() method]	
 		x = 0
 		y = 0
 		possible_characters = 'abcdefgh'
@@ -97,14 +111,18 @@ class Board():
 		y = 8 - int(active_piece[1])
 
 
-		def increment_turn() -> None:
-			if self.blue_turn == 1:
-				self.blue_turn = 0
-				self.red_turn = 1
-			else:
-				self.blue_turn = 1
-				self.red_turn = 0
+		
 
+		#NEW_UPDATE_REQUEST - user input includes dipslaying information so such a function should remain separate.  
+		#NEW_FUNCTION - Display Methods to acquire information to then call methods such as Board.change_piece to manipulate acquired data
+		# def change_piece_input(self): -> None:
+		# 	change_piece_input = ''
+		# 	proper_change_piece_inputs = ['q', 'n', 'b', 'r']
+		# 	while change_piece_input not in proper_change_piece_inputs:
+		# 		try:
+		# 			if change_piece_input
+		# 			change_piece_input = input("Please select what to change your Pawn into: ")
+			###!!!A start to an idea....!!!###
 
 		#UPDATE_REQUEST_01(on_hold) - update to include user input selecting which Piece to morph into
 		def change_piece(updated_piece_type:str) -> None:#morphs Pawn Piece into a new Piece(Q,N,B,R)
@@ -157,7 +175,7 @@ class Board():
 		for index, piece in enumerate(self.living_list):
 			if self.living_list[index].vec.x == x and self.living_list[index].vec.y == y:
 				kill_and_move(index, x, y)
-				increment_turn()
+				self.increment_turn()
 				piece_attacked = True
 				check_pawn_promotion()
 				self.reset_en_pessant()
@@ -171,7 +189,7 @@ class Board():
 					self.en_pessant = True
 					self.en_pessant_coords = [x,y]
 					just_move(x, y)
-					increment_turn()
+					self.increment_turn()
 
 				#Selected Pawn Piece engaging in an EN_PESSANT_ATTACK
 				elif u.Vec2(x, y) == self.living_list[selected_piece].en_pessant_move: #pawn en_pessant attack move
@@ -179,19 +197,19 @@ class Board():
 						if self.living_list[selected_piece].team == 'blue':
 							if u.Vec2(x, y-1) == piece.vec:
 								kill_and_move(index, x, y)
-								increment_turn()
+								self.increment_turn()
 								self.reset_en_pessant()
 								break
 						else:#'red'
 							if u.Vec2(x, y+1) == piece.vec:
 								kill_and_move(index, x, y)
-								increment_turn()
+								self.increment_turn()
 								self.reset_en_pessant()
 								break
 				
 				else:#Pawn Piece moving to EMPTY location
 					just_move(x, y)
-					increment_turn()
+					self.increment_turn()
 					self.reset_en_pessant()
 					check_pawn_promotion()
 	
@@ -271,42 +289,54 @@ class Board():
 				print("\n", end='')
 		print(x_reference_spaced_chars)
 
-	def player_select_piece(self):
+	def player_select_piece(self) -> int:#prompts player for Piece selection via char and int, translates input into and returns self.living_list[] index of selected Piece.
 		active_piece_x = 0
 		active_piece_y = 0
 		active_piece_living_list_index = 0
 		possible_characters = 'abcdefgh'
 		active_color_piece_in_living_list = False
 
-		if self.blue_turn == 1:
-			active_piece = input("Blue player, please select a Piece to move: (ex: 'd5')")
-		else:
-			active_piece = input("Red player, please select a Piece to move: (ex: 'd5')")
+		#COMEBACK HERE.   UPDATE THIS CONDITIONAL TO self.current_player........
+		active_piece = input("{} player, please select a Piece to move: (ex: 'd5')".format(self.current_player.title()))
+
+		# if self.blue_turn == 1:
+		# 	active_piece = input("Blue player, please select a Piece to move: (ex: 'd5')")
+		# else:
+		# 	active_piece = input("Red player, please select a Piece to move: (ex: 'd5')")
 		while active_color_piece_in_living_list == False:
 
-			
+			if active_piece == 'q':
+				return active_piece
+
 			active_piece_x = possible_characters.find(active_piece[0])
 			active_piece_y = 8 - int(active_piece[1])
 			found_match = False
 
-
 			for index, piece in enumerate(self.living_list):
-				#print(self.blue_turn, piece.team, piece.vec.x, piece.vec.y, active_piece_x, active_piece_y)
-				if self.blue_turn == 1 and piece.team == 'blue' and piece.vec.x == active_piece_x and piece.vec.y == active_piece_y:
+				legal_blue_move = self.blue_turn == 1 and piece.team == 'blue' #bool expression assigned to variable
+				legal_red_move = self.red_turn == 1 and piece.team == 'red'
+				if (legal_blue_move or legal_red_move) and piece.vec.x == active_piece_x and piece.vec.y == active_piece_y:
 					active_color_piece_in_living_list = True
 					found_match = True
 					active_piece_living_list_index = index 
 					break
-				elif self.red_turn == 1 and piece.team == 'red' and piece.vec.x == active_piece_x and piece.vec.y == active_piece_y:
-					active_color_piece_in_living_list = True
-					found_match = True 
-					active_piece_living_list_index = index 
-					break
+				# elif self.red_turn == 1 and piece.team == 'red' and piece.vec.x == active_piece_x and piece.vec.y == active_piece_y:
+				# 	active_color_piece_in_living_list = True
+				# 	found_match = True 
+				# 	active_piece_living_list_index = index 
+				# 	break
 	
-			if found_match == False and self.blue_turn == 1:
-				active_piece = input("That piece either doesn't exist or isn't on your team.  Blue player, please select a Piece to move: (ex: 'd5')")
-			elif found_match == False and self.red_turn == 1:
-				active_piece = input("That piece either doesn't exist or isn't on your team.  Red player, please select a Piece to move: (ex: 'd5')")
+			#players = ['blue', 'red']
+
+
+
+			if found_match == False:
+				active_piece = input("That piece either doesn't exist or isn't on your team.  {} player, please select a Piece to move: (ex: 'd5')".format(self.current_player))
+
+
+			
+
+			# elif found_match == False and self.red_turn == 1:
+			# 	active_piece = input("That piece either doesn't exist or isn't on your team.  {}, please select a Piece to move: (ex: 'd5')", {self.current_player})
 
 		return active_piece_living_list_index
-		#print(active_piece_living_list_index)

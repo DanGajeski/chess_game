@@ -125,30 +125,24 @@ class Piece():
 		if action_taken == False:
 			self.impossible_moves_boundary.append(cur_move)
 
-	def display_moves(self) -> None:
-		formatted_moves = []
-		def convert_from_vec2_to_chess_reference_id(formatted_moves:list, movement:Vec2) -> None:
-			#formatted_moves = []
+	def convert_from_vec2_to_chess_reference_id(self, movement:Vec2) -> str:
 			possible_characters = '0a1b2c3d4e5f6g7h'
 			x_reference_char = possible_characters.find(str(movement.x)) + 1
 			y_reference_num = 8 - movement.y
-			formatted_moves.append(possible_characters[x_reference_char] + str(y_reference_num))
-			return formatted_moves
-		#formatted_moves = []
-		#possible_characters = '0a1b2c3d4e5f6g7h'
-		for movement in self.possible_moves_open:
-			formatted_moves = convert_from_vec2_to_chess_reference_id(formatted_moves, movement)
-			# x_reference_char = possible_characters.find(str(movement.vec.x)) + 1
-			# y_reference_num = 8 - movement.vec.y
-			# formatted_moves.append(x_reference_char + str(y_reference_num))
-		for movement in self.possible_moves_enemy:
-			formatted_moves = convert_from_vec2_to_chess_reference_id(formatted_moves, movement)
-			# x_reference_char = possible_characters.find(str(movement.vec.x)) + 1
-			# y_reference_num = 8 - movement.vec.y
-			# formatted_moves.append(x_reference_char + str(y_reference_num))
-		for move in formatted_moves:
-			print(move)
+			return possible_characters[x_reference_char] + str(y_reference_num)
 
+	def display_moves(self) -> None:
+		formatted_moves = []
+		
+		#inverse method
+
+		for movement in self.possible_moves_open:
+			formatted_moves.append(self.convert_from_vec2_to_chess_reference_id(movement))
+		for movement in self.possible_moves_enemy:
+			formatted_moves.append(self.convert_from_vec2_to_chess_reference_id(movement))
+		for move in formatted_moves:
+			print(move) 
+	#break down into small specific tasks, use that as a building block. 
 
 
 	#def move_piece(self, x:int, y:int) -> None:
@@ -269,11 +263,6 @@ class Pawn(Piece):
 		self.determine_possible_moves_straight_pawn(potential_spaces)
 		self.check_space_pawn(potential_spaces, (self.vec + (move_down * self.direction) + move_left))
 		self.check_space_pawn(potential_spaces, (self.vec + (move_down * self.direction) + move_right))
-
-	#enPESSANT
-	#IF in turn previous...OTHERCOLOR PAWN MOVES FROM cols Pos and Neg in relate
-	#to current pawn... then can kill OTHERCOLOR pawn and move to OTHERCOLOR pawn's prev location
-	# (TURN ATTRIBUTE? ON CHESS BOARD??,PAWN(PIECE) PREV TURN LOCATION ATTRIBUTE??)
 
 class Rook(Piece):
 	def __init__(self, vec:Vec2, team:str) -> None:

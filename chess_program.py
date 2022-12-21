@@ -34,22 +34,31 @@ turn = 0
 # 	turn += 1
 # 	os.system('cls')
 
+#Don't  Listen to the lies.  You are a kickass programmer.  Only getting better and better each day.  
 
 
-user_input = ''
-#while user_input != 'q':
+balls = ''
 fuck_2 = chess_board_test.Board()
 fuck_2.initialize_both_teams()
 fuck_2.set_open_closed_spaces()
 
-
-while user_input != 'q':
+print("WELCOME TO HELL CHESS")
+fuck_2.increment_turn()
+while True:
+	#print(fuck_2.current_player)
+	#fuck_2.increment_turn()`
+	#print(fuck_2.current_player)
 	fuck_2.display_board()
 	balls = fuck_2.player_select_piece()
+	if balls == 'q':
+		print("Thank you for playing you fuck.")
+		break
 	fuck_2.select_piece_determine_movements(balls)
 	fuck_2.select_piece_display_movements(balls)
 	fuck_2.move_piece(balls)
 	fuck_2.set_open_closed_spaces()
+	#ending - another point of loop termination
+
 
 
 #fuck_2.list_active_pieces()
