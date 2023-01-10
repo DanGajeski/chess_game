@@ -6,6 +6,7 @@
 from __future__ import annotations
 from chess_pieces import Pawn, Knight, Rook, Bishop, Queen, King
 import utils as u
+import curses
 
 class Board():
 
@@ -261,6 +262,46 @@ class Board():
 
 	def select_piece_display_movements(self, piece_index:int) -> None:#displays to user the selected Piece's possible movements as Vec2 coords
 		self.living_list[piece_index].display_moves()
+
+
+	def display_board_curses(self, stdscr):
+		def determine_displayed_symbol(x:int, y:int) -> str:
+			unformatted_symbol = " "
+			for piece in self.living_list:
+				if x == piece.vec.x and y == piece.vec.y:
+					unformatted_symbol = piece.type
+					break
+			return "_(%s)_" % unformatted_symbol
+
+		y_index = 0
+		x_index = 0
+		y_reference_num = 8
+		x_reference_spaced_chars = "      A    B    C    D    E    F    G    H"
+		stdscr.addstr(y_index, x_index, x_reference_spaced_chars)
+		for y in range(self.y_rows):#prints entire board and assigned symbols
+			stdscr.addstr(y_index, x_index, y_reference_num)
+			#print(y_reference_num, end='')
+			stdscr.addstr(y_index, (x_index + 1), "||_")
+			#print("||_", end='')
+			x_sub_index = 4
+			for x in range(self.x_cols):
+				stdscr.addstr(y_index, x_sub_index, determine_displayed_symbol(x, y))
+				x_sub_index += 5 
+				#print(determine_displayed_symbol(x, y), end='')
+			stdscr.addstr(y_index, (x_sub_index + 5), "_||")
+			x_sub_index += 5
+			#print("_||", end='')
+			stdscr.addstr(y_index, (x_sub_index + 3), y_reference_num)
+			print(y_reference_num, end='')
+			y_reference_num -= 1
+			y_index += 1
+			# if y != self.y_rows - 1:	
+			# 	print("\n")
+			# else:
+			# 	print("\n", end='')
+		stdscr.addstr(y_index, x_index, x_reference_spaced_chars)
+		#print(x_reference_spaced_chars)
+
 
 	def display_board(self):#determines which self.living_list[] Piece symbols to print and where, then prints entire board to user screen
 
