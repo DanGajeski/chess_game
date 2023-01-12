@@ -273,34 +273,27 @@ class Board():
 					break
 			return "_(%s)_" % unformatted_symbol
 
-		y_index = 0
-		x_index = 0
+		y_index = 1
+		x_index = 1
 		y_reference_num = 8
 		x_reference_spaced_chars = "      A    B    C    D    E    F    G    H"
+
 		stdscr.addstr(y_index, x_index, x_reference_spaced_chars)
+		y_index += 1
 		for y in range(self.y_rows):#prints entire board and assigned symbols
-			stdscr.addstr(y_index, x_index, y_reference_num)
-			#print(y_reference_num, end='')
+			stdscr.addstr(y_index, x_index, str(y_reference_num))
 			stdscr.addstr(y_index, (x_index + 1), "||_")
-			#print("||_", end='')
-			x_sub_index = 4
+			x_sub_index = 5
 			for x in range(self.x_cols):
 				stdscr.addstr(y_index, x_sub_index, determine_displayed_symbol(x, y))
 				x_sub_index += 5 
-				#print(determine_displayed_symbol(x, y), end='')
-			stdscr.addstr(y_index, (x_sub_index + 5), "_||")
-			x_sub_index += 5
-			#print("_||", end='')
-			stdscr.addstr(y_index, (x_sub_index + 3), y_reference_num)
-			print(y_reference_num, end='')
+			stdscr.addstr(y_index, x_sub_index, "_||")
+			x_sub_index += 3
+			stdscr.addstr(y_index, x_sub_index, str(y_reference_num))
 			y_reference_num -= 1
-			y_index += 1
-			# if y != self.y_rows - 1:	
-			# 	print("\n")
-			# else:
-			# 	print("\n", end='')
-		stdscr.addstr(y_index, x_index, x_reference_spaced_chars)
-		#print(x_reference_spaced_chars)
+			y_index += 2
+		stdscr.addstr((y_index - 1), x_index, x_reference_spaced_chars)
+		#$you are not the lies in your head.
 
 
 	def display_board(self):#determines which self.living_list[] Piece symbols to print and where, then prints entire board to user screen
