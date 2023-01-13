@@ -77,6 +77,10 @@ def display_current_loc(stdscr, cur_loc):
 				  16: 1,
 				 }
 
+		#curses.init_pair(1,1,7)#blue_WHITE
+		#curses.init_pair(2,4,7)#red_WHITE
+		#curses.init_pair(3,1,0)#blue_BLACK
+		#curses.init_pair(4,4,0)#red_BLACK
 		print_string = '({}, {})'.format(y_dict[cur_loc[0]], x_dict[cur_loc[1]])
 		stdscr.addstr(19,2,"({},{})".format(cur_loc[0], cur_loc[1]))
 		stdscr.addstr(18,2,"CursorLoc: {}".format(print_string))
@@ -180,7 +184,7 @@ def draw_screen(stdscr):
 	# stdscr.getstr(0,0,8)
 	# curses.noecho()
 
-	stdscr.keypad(True)
+	stdscr.keypad(1)
 	stdscr.clear()
 	#stdscr.border()
 
@@ -191,6 +195,22 @@ def draw_screen(stdscr):
 	#stdscr.resize(50,100)
 	stdscr.border()
 	stdscr.refresh()
+	#move_cursor(stdscr)
+
+	curses.mousemask(1)
+
+	while True:
+		event = stdscr.getch()
+		if event == ord("q"):
+			break
+		if event == curses.KEY_MOUSE:
+			stdscr.addstr(20,0,"youclickedbud")
+			_, mx, my, _, _ = curses.getmouse()
+			y, x = stdscr.getyx()
+			stdscr.addstr(20,0,"hello")
+			stdscr.refresh()
+	#stdscr.addstr(20,0,"hello")
+	#stdscr.getch()
 
 	# pad_one = curses.newpad(30,30)
 	# pad_one.border()
@@ -235,7 +255,7 @@ def draw_screen(stdscr):
 	# pad_one.refresh(0,0, 0,0, 30,30)
 	
 
-	move_cursor(stdscr)
+	
 	####TEMPCOMMENTEDOUT###
 	
 	# left = 260
