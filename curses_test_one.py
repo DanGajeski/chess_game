@@ -55,27 +55,28 @@ new_board.initialize_both_teams()
 new_board.set_open_closed_spaces()
 new_board.increment_turn()
 
+
+
+
 #THEY ARE LIES.  DON'T LISTEN.   
 
-def display_current_loc(stdscr, cur_loc):
-		x_dict = {8: 'A',
-				  13: 'B',
-				  18: 'C',
-				  23: 'D',
-				  28: 'E',
-				  33: 'F',
-				  38: 'G',
-				  43: 'H',
-				 }
-		y_dict = {5: 8,
-				  7: 7,
-				  9: 6,
-				  11: 5,
-				  13: 4,
-				  15: 3,
-				  17: 2,
-				  19: 1,
-				 }
+def display_current_loc(stdscr, cur_loc, origin):
+		y_coord_ref = origin[0]
+		x_coord_ref = origin[1]
+
+
+		x_dict = {}
+		y_dict = {}
+		x_additive = 5
+		y_additive = 2 
+		letters = ('A','B','C','D','E','F','G','H')
+
+		for x in range(0,8):
+			x_dict[origin[1]+x*x_additive] = letters[x]
+		for y in range(0,8):
+			y_dict[origin[0]+y*y_additive] = 8-y
+
+
 
 		#curses.init_pair(1,1,7)#blue_WHITE
 		#curses.init_pair(2,4,7)#red_WHITE
@@ -113,8 +114,11 @@ def move_cb_cursor(stdscr,cb_y_pos,cb_x_pos):
 		
 			stdscr.move(move_location[0], move_location[1])
 			stdscr.refresh()
-			#cur_loc = curses.getsyx()
-			#display_current_loc(stdscr, cur_loc)
+			
+			#cur_loc = curses.getsyx()	
+			cur_loc = (move_location[0],move_location[1])		
+			display_current_loc(stdscr, cur_loc, origin)
+			
 			stdscr.refresh()
 			stdscr.move(move_location[0], move_location[1])
 			stdscr.refresh()
@@ -211,8 +215,8 @@ def draw_screen(stdscr):
 	stdscr.addstr(1,2,"F8(Game_Menu)")
 	stdscr.refresh()
 
-	cb_y_pos = 8
-	cb_x_pos = 60
+	cb_y_pos = 10
+	cb_x_pos = 44
 	cb_col_num = 17
 	cb_row_num = 49
 	chess_board_win = curses.newwin(cb_col_num,cb_row_num,cb_y_pos,cb_x_pos)
