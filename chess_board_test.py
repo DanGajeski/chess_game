@@ -380,7 +380,7 @@ class Board():
 			y_reference_num -= 1
 			y_index += 2
 		chess_board_pad.addstr((y_index - 1), x_index, x_reference_spaced_chars, curses.color_pair(7))
-		chess_board_pad.refresh(0,0,4,1,20,50)
+		chess_board_pad.refresh()
 		#$you are not the lies in your head.
 
 
