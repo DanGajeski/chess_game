@@ -101,17 +101,20 @@ def display_current_loc(stdscr, cur_loc):
 # 		if cursor_direction == 113:
 # 			break
 
-def move_cursor(stdscr):
+def move_cb_cursor(stdscr,cb_y_pos,cb_x_pos):
+	origin = [0,0]
+	origin[0] = cb_y_pos + 1
+	origin[1] = cb_x_pos + 7
 	def check_move_in_limit(move_location, old_cur_loc):
-		y_limit = list(range(5,20))
-		x_limit = list(range(8,44))
+		y_limit = list(range(origin[0],origin[0]+15))
+		x_limit = list(range(origin[1],origin[1]+36))
 
 		if move_location[0] in y_limit and move_location[1] in x_limit:
 		
 			stdscr.move(move_location[0], move_location[1])
 			stdscr.refresh()
-			cur_loc = curses.getsyx()
-			display_current_loc(stdscr, cur_loc)
+			#cur_loc = curses.getsyx()
+			#display_current_loc(stdscr, cur_loc)
 			stdscr.refresh()
 			stdscr.move(move_location[0], move_location[1])
 			stdscr.refresh()
@@ -126,15 +129,19 @@ def move_cursor(stdscr):
 	up = 259
 	down = 258
 	q = 113
-	stdscr.move(5, 8)
+	stdscr.move(origin[0], origin[1])
 	stdscr.refresh()
 	#chess_board_pad.refresh(0,0,4,1,19,50)
-	cur_loc = curses.getsyx()#(y,x)tuple returned
+	#cur_loc = [0,0]
+	#cur_loc_stdscr = curses.getsyx()#(y,x)tuple returned
+	#cur_loc[0] = cur_loc_stdscr[0] + origin[0]
+	#cur_loc[1] = cur_loc_stdscr[1] + origin[1]
 	#cur_loc = list(cur_loc_tuple)
 	#cur_loc = cur_loc_tuple[0] - 4
 	#cur_loc.append(cur_loc_tuple[1] - 1)
 	#cur_loc[0] -= 4
 	#cur_loc[1] -= 1
+	cur_loc = [origin[0],origin[1]]
 	cursor_direction = 0
 
 	
@@ -187,7 +194,8 @@ def move_cursor(stdscr):
 
 
 #def game_menu(stdscr):
-
+# def cursor_start_loc(stdscr,cb_y_pos,cb_x_pos):
+# 	return (cb_y_pos+1,cb_x_pos+7)
 
 def draw_screen(stdscr):
 
@@ -199,10 +207,16 @@ def draw_screen(stdscr):
 	stdscr.clear()
 	#stdscr.border()
 
+	stdscr.border()
 	stdscr.addstr(1,2,"F8(Game_Menu)")
+	stdscr.refresh()
 
-	chess_board_pad = curses.newpad(17,49)
-	new_board.display_board_curses(chess_board_pad)
+	cb_y_pos = 8
+	cb_x_pos = 60
+	cb_col_num = 17
+	cb_row_num = 49
+	chess_board_win = curses.newwin(cb_col_num,cb_row_num,cb_y_pos,cb_x_pos)
+	new_board.display_board_curses(chess_board_win)
 
 
 	#new_board.display_board_curses(stdscr)
@@ -210,10 +224,13 @@ def draw_screen(stdscr):
 
 
 	#stdscr.resize(50,100)
-	stdscr.border()
-	stdscr.refresh()
-	chess_board_pad.refresh(0,0,4,1,20,50)
-	move_cursor(stdscr)
+	#stdscr.border()
+	#stdscr.refresh()
+	chess_board_win.refresh()
+	#chess_board_pad.refresh(0,0,4,1,20,50)
+	
+	move_cb_cursor(stdscr,cb_y_pos,cb_x_pos)
+	#move_cb_cursor(stdscr,cursor_start_loc(stdscr,cb_y_pos,cb_x_pos))
 
 	# curses.mousemask(1)
 
