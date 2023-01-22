@@ -58,32 +58,32 @@ new_board.increment_turn()
 #THEY ARE LIES.  DON'T LISTEN.   
 
 def display_current_loc(stdscr, cur_loc):
-		x_dict = {7: 'A',
-				  12: 'B',
-				  17: 'C',
-				  22: 'D',
-				  27: 'E',
-				  32: 'F',
-				  37: 'G',
-				  42: 'H',
+		x_dict = {8: 'A',
+				  13: 'B',
+				  18: 'C',
+				  23: 'D',
+				  28: 'E',
+				  33: 'F',
+				  38: 'G',
+				  43: 'H',
 				 }
-		y_dict = {2: 8,
-				  4: 7,
-				  6: 6,
-				  8: 5,
-				  10: 4,
-				  12: 3,
-				  14: 2,
-				  16: 1,
+		y_dict = {5: 8,
+				  7: 7,
+				  9: 6,
+				  11: 5,
+				  13: 4,
+				  15: 3,
+				  17: 2,
+				  19: 1,
 				 }
 
 		#curses.init_pair(1,1,7)#blue_WHITE
 		#curses.init_pair(2,4,7)#red_WHITE
 		#curses.init_pair(3,1,0)#blue_BLACK
 		#curses.init_pair(4,4,0)#red_BLACK
+		stdscr.addstr(22,2,"({},{})".format(cur_loc[0], cur_loc[1]))
 		print_string = '({}, {})'.format(y_dict[cur_loc[0]], x_dict[cur_loc[1]])
-		stdscr.addstr(19,2,"({},{})".format(cur_loc[0], cur_loc[1]))
-		stdscr.addstr(18,2,"CursorLoc: {}".format(print_string))
+		stdscr.addstr(21,2,"CursorLoc: {}".format(print_string))
 
 # while cursor_direction != 113:#113ASCIIq
 		
@@ -103,8 +103,8 @@ def display_current_loc(stdscr, cur_loc):
 
 def move_cursor(stdscr):
 	def check_move_in_limit(move_location, old_cur_loc):
-		y_limit = list(range(2,17))
-		x_limit = list(range(7,43))
+		y_limit = list(range(5,20))
+		x_limit = list(range(8,44))
 
 		if move_location[0] in y_limit and move_location[1] in x_limit:
 		
@@ -126,9 +126,15 @@ def move_cursor(stdscr):
 	up = 259
 	down = 258
 	q = 113
-	stdscr.move(2, 7)
+	stdscr.move(5, 8)
 	stdscr.refresh()
+	#chess_board_pad.refresh(0,0,4,1,19,50)
 	cur_loc = curses.getsyx()#(y,x)tuple returned
+	#cur_loc = list(cur_loc_tuple)
+	#cur_loc = cur_loc_tuple[0] - 4
+	#cur_loc.append(cur_loc_tuple[1] - 1)
+	#cur_loc[0] -= 4
+	#cur_loc[1] -= 1
 	cursor_direction = 0
 
 	
@@ -165,6 +171,7 @@ def move_cursor(stdscr):
 			#UPDATELATER
 
 		stdscr.refresh()
+		#chess_board_pad.refresh(0,0,4,1,19,50)
 
 		#stdscr.addstr(2,2,str(move_location[0]))
 		#stdscr.addstr(3,2,str(move_location[1]))
@@ -178,6 +185,10 @@ def move_cursor(stdscr):
 	# #stdscr.move(cur_loc[0], cur_loc[1])
 	# stdscr.refresh()
 
+
+#def game_menu(stdscr):
+
+
 def draw_screen(stdscr):
 
 	# curses.echo()
@@ -188,27 +199,34 @@ def draw_screen(stdscr):
 	stdscr.clear()
 	#stdscr.border()
 
-	new_board.display_board_curses(stdscr)
+	stdscr.addstr(1,2,"F8(Game_Menu)")
+
+	chess_board_pad = curses.newpad(17,49)
+	new_board.display_board_curses(chess_board_pad)
+
+
+	#new_board.display_board_curses(stdscr)
 
 
 
 	#stdscr.resize(50,100)
 	stdscr.border()
 	stdscr.refresh()
-	#move_cursor(stdscr)
+	chess_board_pad.refresh(0,0,4,1,20,50)
+	move_cursor(stdscr)
 
-	curses.mousemask(1)
+	# curses.mousemask(1)
 
-	while True:
-		event = stdscr.getch()
-		if event == ord("q"):
-			break
-		if event == curses.KEY_MOUSE:
-			stdscr.addstr(20,0,"youclickedbud")
-			_, mx, my, _, _ = curses.getmouse()
-			y, x = stdscr.getyx()
-			stdscr.addstr(20,0,"hello")
-			stdscr.refresh()
+	# while True:
+	# 	event = stdscr.getch()
+	# 	if event == ord("q"):
+	# 		break
+	# 	if event == curses.KEY_MOUSE:
+	# 		stdscr.addstr(20,0,"youclickedbud")
+	# 		_, mx, my, _, _ = curses.getmouse()
+	# 		y, x = stdscr.getyx()
+	# 		stdscr.addstr(20,0,"hello")
+	# 		stdscr.refresh()
 	#stdscr.addstr(20,0,"hello")
 	#stdscr.getch()
 

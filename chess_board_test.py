@@ -264,7 +264,7 @@ class Board():
 		self.living_list[piece_index].display_moves()
 
 
-	def display_board_curses(self, stdscr):
+	def display_board_curses(self, chess_board_pad):
 		def determine_displayed_symbol(x:int, y:int, y_index, x_sub_index) -> str:
 			unformatted_symbol = " "
 			team_color = ""
@@ -275,7 +275,7 @@ class Board():
 					break
 			color_pair_num = 0	
 			if team_color == "blue":
-				if y % 2 == 1:
+				if y % 2 == 0:
 					if x % 2 == 1:
 						color_pair_num = 4
 
@@ -290,7 +290,7 @@ class Board():
 						color_pair_num = 4
 
 			elif team_color == "red":
-				if y % 2 == 1:
+				if y % 2 == 0:
 					if x % 2 == 1:
 						color_pair_num = 3
 
@@ -305,7 +305,7 @@ class Board():
 						color_pair_num = 3
 
 			else:
-				if y % 2 == 1:
+				if y % 2 == 0:
 					if x % 2 == 1:
 						color_pair_num = 5
 
@@ -319,7 +319,7 @@ class Board():
 					else:
 						color_pair_num = 5
 
-			stdscr.addstr(y_index, x_sub_index+2, unformatted_symbol, curses.color_pair(color_pair_num) | curses.A_BOLD)
+			chess_board_pad.addstr(y_index, x_sub_index+2, unformatted_symbol, curses.color_pair(color_pair_num) | curses.A_BOLD)
 
 			# stdscr.addstr(y_index, x_sub_index+2, unformatted_symbol, curses.)
 			# return unformatted_symbol
@@ -327,7 +327,7 @@ class Board():
 		#run check at beginning to see if terminal can use custom colors.
 		#turn custom colors on or off depending on terminal capability. 
 
-		y_index = 1
+		y_index = 0
 		x_index = 1
 		y_reference_num = 8
 		x_reference_spaced_chars = "      A    B    C    D    E    F    G    H"
@@ -340,47 +340,47 @@ class Board():
 		curses.init_pair(7,curses.COLOR_GREEN,curses.COLOR_BLACK) 	#green_BLACK
 
 
-		stdscr.addstr(y_index, x_index, x_reference_spaced_chars, curses.color_pair(7))
+		chess_board_pad.addstr(y_index, x_index, x_reference_spaced_chars, curses.color_pair(7))
 		y_index += 1
 		for y in range(self.y_rows):#prints entire board and assigned symbols
-			stdscr.addstr(y_index, x_index, str(y_reference_num), curses.color_pair(7))
-			stdscr.addstr(y_index, (x_index + 1), "|| ", curses.color_pair(4))
+			chess_board_pad.addstr(y_index, x_index, str(y_reference_num), curses.color_pair(7))
+			chess_board_pad.addstr(y_index, (x_index + 1), "|| ", curses.color_pair(4))
 			x_sub_index = 5
-			if y % 2 == 1:
+			if y % 2 == 0:
 				for x in range(self.x_cols):
 					if x_sub_index % 2 == 1:
-						stdscr.addstr(y_index, x_sub_index, " (", curses.color_pair(1))
+						chess_board_pad.addstr(y_index, x_sub_index, " (", curses.color_pair(1))
 						determine_displayed_symbol(x, y, y_index, x_sub_index)
 						#stdscr.addstr(y_index, x_sub_index+2, determine_displayed_symbol(x, y))
-						stdscr.addstr(y_index, x_sub_index+3, ") ", curses.color_pair(1))
+						chess_board_pad.addstr(y_index, x_sub_index+3, ") ", curses.color_pair(1))
 						x_sub_index += 5 
 					else:
-						stdscr.addstr(y_index, x_sub_index, " (", curses.color_pair(4))
+						chess_board_pad.addstr(y_index, x_sub_index, " (", curses.color_pair(4))
 						determine_displayed_symbol(x, y, y_index, x_sub_index)
 						#stdscr.addstr(y_index, x_sub_index+2, determine_displayed_symbol(x, y))
-						stdscr.addstr(y_index, x_sub_index+3, ") ", curses.color_pair(4))
+						chess_board_pad.addstr(y_index, x_sub_index+3, ") ", curses.color_pair(4))
 						x_sub_index += 5
 			else:
 				for x in range(self.x_cols):
 					if x_sub_index % 2 == 1:
-						stdscr.addstr(y_index, x_sub_index, " (", curses.color_pair(4))
+						chess_board_pad.addstr(y_index, x_sub_index, " (", curses.color_pair(4))
 						determine_displayed_symbol(x, y, y_index, x_sub_index)
 						#stdscr.addstr(y_index, x_sub_index+2, determine_displayed_symbol(x, y))
-						stdscr.addstr(y_index, x_sub_index+3, ") ", curses.color_pair(4))
+						chess_board_pad.addstr(y_index, x_sub_index+3, ") ", curses.color_pair(4))
 						x_sub_index += 5 
 					else:
-						stdscr.addstr(y_index, x_sub_index, " (", curses.color_pair(1))
+						chess_board_pad.addstr(y_index, x_sub_index, " (", curses.color_pair(1))
 						determine_displayed_symbol(x, y, y_index, x_sub_index)
 						#stdscr.addstr(y_index, x_sub_index+2, determine_displayed_symbol(x, y))
-						stdscr.addstr(y_index, x_sub_index+3, ") ", curses.color_pair(1))
+						chess_board_pad.addstr(y_index, x_sub_index+3, ") ", curses.color_pair(1))
 						x_sub_index += 5
-			stdscr.addstr(y_index, x_sub_index, " ||", curses.color_pair(4))
+			chess_board_pad.addstr(y_index, x_sub_index, " ||", curses.color_pair(4))
 			x_sub_index += 3
-			stdscr.addstr(y_index, x_sub_index, str(y_reference_num), curses.color_pair(7))
+			chess_board_pad.addstr(y_index, x_sub_index, str(y_reference_num), curses.color_pair(7))
 			y_reference_num -= 1
 			y_index += 2
-		stdscr.addstr((y_index - 1), x_index, x_reference_spaced_chars, curses.color_pair(7))
-		stdscr.refresh()
+		chess_board_pad.addstr((y_index - 1), x_index, x_reference_spaced_chars, curses.color_pair(7))
+		chess_board_pad.refresh(0,0,4,1,20,50)
 		#$you are not the lies in your head.
 
 

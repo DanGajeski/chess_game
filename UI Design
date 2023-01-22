@@ -20,8 +20,8 @@ turn_timer
 
 (VICTORY/DEFEAT Screen.   + Continue / Quit screen afterwards)
 (Mouse may not be available for all systems - if available... set primary buttons to be clickable)
-________________________________________________________________________________
-F8(Game_menu)    FUCKIN CHESS		('esc' to one-up)	    Player Turn             Game_menu - goes to new screen with:
+________________________________________________________________________________          Debug_menu - secret hotkey?
+F8(Game_menu)    FUCKIN CHESS ('esc' to one-up)	    Player Turn  F9(Debug_menu)           Game_menu - goes to new screen with:
 		         										   Turn # / timer           save_options
       A    B    C    D    E    F    G    H        B                           R     quit_options                                                                                                 
 8||__(R)__(T)__(B)__(Q)__(K)__(B)__(T)__(R)__||8  _                           _     send_a_taunt_option -upon next player's turn, show taunt-screen                                                                                                
