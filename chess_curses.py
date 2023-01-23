@@ -131,87 +131,87 @@ def display_board_curses(board, chess_board_pad):
 
 
 
-def display_current_loc(stdscr, cur_loc, origin):
-		y_coord_ref = origin[0]
-		x_coord_ref = origin[1]
+# def display_current_loc(stdscr, cur_loc, origin):
+# 	y_coord_ref = origin[0]
+# 	x_coord_ref = origin[1]
 
-		x_dict = {}
-		y_dict = {}
-		x_additive = 5
-		y_additive = 2 
-		letters = ('A','B','C','D','E','F','G','H')
+# 	x_dict = {}
+# 	y_dict = {}
+# 	x_additive = 5
+# 	y_additive = 2 
+# 	letters = ('A','B','C','D','E','F','G','H')
 
-		for x in range(0,8):
-			x_dict[origin[1]+x*x_additive] = letters[x]
-		for y in range(0,8):
-			y_dict[origin[0]+y*y_additive] = 8-y
+# 	for x in range(0,8):
+# 		x_dict[origin[1]+x*x_additive] = letters[x]
+# 	for y in range(0,8):
+# 		y_dict[origin[0]+y*y_additive] = 8-y
 
-		stdscr.addstr(22,2,"({},{})".format(cur_loc[0], cur_loc[1]))
-		print_string = '({}, {})'.format(y_dict[cur_loc[0]], x_dict[cur_loc[1]])
-		stdscr.addstr(21,2,"CursorLoc: {}".format(print_string))
+# 	stdscr.addstr(22,2,"({},{})".format(cur_loc[0], cur_loc[1]))
+# 	print_string = '({}, {})'.format(y_dict[cur_loc[0]], x_dict[cur_loc[1]])
+# 	stdscr.addstr(21,2,"CursorLoc: {}".format(print_string))
 
-def move_cb_cursor(stdscr,cb_y_pos,cb_x_pos):
-	origin = [0,0]
-	origin[0] = cb_y_pos + 1
-	origin[1] = cb_x_pos + 7
-	def check_move_in_limit(move_location, old_cur_loc):
-		y_limit = list(range(origin[0],origin[0]+15))
-		x_limit = list(range(origin[1],origin[1]+36))
+# def move_cb_cursor(stdscr,cb_y_pos,cb_x_pos):
+# 	origin = [0,0]
+# 	origin[0] = cb_y_pos + 1
+# 	origin[1] = cb_x_pos + 7
+# 	def check_move_in_limit(move_location, old_cur_loc):
+# 		y_limit = list(range(origin[0],origin[0]+15))
+# 		x_limit = list(range(origin[1],origin[1]+36))
 
-		if move_location[0] in y_limit and move_location[1] in x_limit:
+# 		if move_location[0] in y_limit and move_location[1] in x_limit:
 		
-			stdscr.move(move_location[0], move_location[1])
-			stdscr.refresh()
+# 			stdscr.move(move_location[0], move_location[1])
+# 			stdscr.refresh()
 			
-			cur_loc = (move_location[0],move_location[1])		
-			display_current_loc(stdscr, cur_loc, origin)
+# 			cur_loc = (move_location[0],move_location[1])		
+# 			display_current_loc(stdscr, cur_loc, origin)
 			
-			stdscr.refresh()
-			stdscr.move(move_location[0], move_location[1])
-			stdscr.refresh()
+# 			stdscr.refresh()
+# 			stdscr.move(move_location[0], move_location[1])
+# 			stdscr.refresh()
 
-			return (move_location[0], move_location[1])
+# 			return (move_location[0], move_location[1])
 
-		else:
-			return old_cur_loc
+# 		else:
+# 			return old_cur_loc
 
-	left = 260
-	right = 261
-	up = 259
-	down = 258
-	q = 113
-	stdscr.move(origin[0], origin[1])
-	stdscr.refresh()
-	cur_loc = [origin[0],origin[1]]
-	cursor_direction = 0
+# 	left = 260
+# 	right = 261
+# 	up = 259
+# 	down = 258
+# 	q = 113
+# 	stdscr.move(origin[0], origin[1])
+# 	stdscr.refresh()
+# 	cur_loc = [origin[0],origin[1]]
+# 	cursor_direction = 0
 
 	
-	move_location = [0, 0]
+# 	move_location = [0, 0]
 
-	while cursor_direction != 113:
-		cursor_direction = stdscr.getch()
+# 	while cursor_direction != 113:
+# 		cursor_direction = stdscr.getch()
 
 
-		if cursor_direction == left:
-			move_location[0] = cur_loc[0]
-			move_location[1] = cur_loc[1] - 5
-			cur_loc = check_move_in_limit(move_location, cur_loc)
-		elif cursor_direction == right:
-			move_location[0] = cur_loc[0]
-			move_location[1] = cur_loc[1] + 5
-			cur_loc = check_move_in_limit(move_location, cur_loc)
-		elif cursor_direction == up:
-			move_location[0] = cur_loc[0] - 2
-			move_location[1] = cur_loc[1]
-			cur_loc = check_move_in_limit(move_location, cur_loc)
-		elif cursor_direction == down:
-			move_location[0] = cur_loc[0] + 2
-			move_location[1] = cur_loc[1]
-			cur_loc = check_move_in_limit(move_location, cur_loc)
-		elif cursor_direction == q:
-			break
+# 		if cursor_direction == left:
+# 			move_location[0] = cur_loc[0]
+# 			move_location[1] = cur_loc[1] - 5
+# 			cur_loc = check_move_in_limit(move_location, cur_loc)
+# 		elif cursor_direction == right:
+# 			move_location[0] = cur_loc[0]
+# 			move_location[1] = cur_loc[1] + 5
+# 			cur_loc = check_move_in_limit(move_location, cur_loc)
+# 		elif cursor_direction == up:
+# 			move_location[0] = cur_loc[0] - 2
+# 			move_location[1] = cur_loc[1]
+# 			cur_loc = check_move_in_limit(move_location, cur_loc)
+# 		elif cursor_direction == down:
+# 			move_location[0] = cur_loc[0] + 2
+# 			move_location[1] = cur_loc[1]
+# 			cur_loc = check_move_in_limit(move_location, cur_loc)
+# 		elif cursor_direction == q:
+# 			break
 
-		stdscr.refresh()
+# 		stdscr.refresh()
 
 
 
@@ -231,13 +231,79 @@ def create_board():
 board_one = create_board()
 board_two = create_board()
 
+class DebugMenuComponent():
+	def __init__(self,x,y):
+		self.x = x
+		self.y = y
+		row_count = 5
+		col_count = 30
+		self.window = curses.newwin(row_count,col_count,self.y,self.x)
+		self.cover_window = curses.newwin(row_count,col_count,self.y,self.x)
+		self.cur_loc = [8,'A']
+		self.cur_loc_y_x = [1,7]
+		self.origin = (1,7)
+		self.d_menu_on = False
+
+	#def update_cur_loc(self,):
+	# def update_menu_display(self):
+	# 	window.addstr(0,0,"({},{})".format(cur_loc_y_x[0], cur_loc_y_x[1]))
+	# 	window.addstr(1,0,"CursorLoc: {}".format(cur_loc[0],cur_loc[1]))
+
+	def update_menu_display(self):
+		#self.window.clear()
+		#self.window.addstr(0,0,"({},{})".format(self.cur_loc_y_x[0], self.cur_loc_y_x[1]))
+		#self.window.addstr(1,0,"CursorLoc: {},{}".format(self.cur_loc[0],self.cur_loc[1]))
+		if self.d_menu_on:
+			self.window.clear()
+			self.window.addstr(0,0,"({},{})".format(self.cur_loc_y_x[0], self.cur_loc_y_x[1]))
+			self.window.addstr(1,0,"CursorLoc: {},{}".format(self.cur_loc[0],self.cur_loc[1]))
+			self.window.refresh()
+		else:
+			self.window.clear()
+			self.window.addstr(0,0,"({},{})".format(self.cur_loc_y_x[0], self.cur_loc_y_x[1]))
+			self.window.addstr(1,0,"CursorLoc: {},{}".format(self.cur_loc[0],self.cur_loc[1]))
+			#self.window.noutrefresh()
+
+	def display_menu_window(self):
+		if self.d_menu_on:
+			self.cover_window.touchwin()
+			self.cover_window.refresh()
+			self.d_menu_on = False
+		else:
+			#self.window.addstr(0,0,"({},{})".format(self.cur_loc_y_x[0], self.cur_loc_y_x[1]))
+			#self.window.addstr(1,0,"CursorLoc: {},{}".format(self.cur_loc[0],self.cur_loc[1]))
+			self.window.touchwin()
+			self.window.refresh()
+			self.d_menu_on = True 
+
+	def calculate_cur_loc(self,y_import,x_import):
+		self.cur_loc_y_x[0] = y_import
+		self.cur_loc_y_x[1] = x_import
+		x_dict = {}
+		y_dict = {}
+		x_additive = 5
+		y_additive = 2 
+		letters = ('A','B','C','D','E','F','G','H')
+
+		for x in range(0,8):
+			x_dict[self.origin[1]+x*x_additive] = letters[x]
+		for y in range(0,8):
+			y_dict[self.origin[0]+y*y_additive] = 8-y
+
+		self.cur_loc[0] = y_dict[self.cur_loc_y_x[0]]
+		self.cur_loc[1] = x_dict[self.cur_loc_y_x[1]]
+
+	# stdscr.addstr(22,2,"({},{})".format(cur_loc[0], cur_loc[1]))
+	# print_string = '({}, {})'.format(y_dict[cur_loc[0]], x_dict[cur_loc[1]])
+	# stdscr.addstr(21,2,"CursorLoc: {}".format(print_string))
 
 
 class ChessBoardComponent():
-	def __init__(self,board,x,y):
+	def __init__(self,board,x,y,debug_menu):
 		self.x = x
 		self.y = y
 		self.board = board
+		self.debug_menu = debug_menu
 		row_count = 17
 		col_count = 49
 		self.window = curses.newwin(row_count,col_count,self.y,self.x)
@@ -255,10 +321,13 @@ class ChessBoardComponent():
 
 			if move_location[0] in y_limit and move_location[1] in x_limit:
 				
-				cur_loc = (move_location[0],move_location[1])		
-				#display_current_loc(stdscr, cur_loc, origin)
-				self.window.move(move_location[0], move_location[1])
+				cur_loc = (move_location[0],move_location[1])
 
+				#display_current_loc(stdscr, cur_loc, origin)
+
+				self.window.move(move_location[0], move_location[1])
+				self.debug_menu.calculate_cur_loc(move_location[0],move_location[1])
+				self.debug_menu.update_menu_display()
 				return (move_location[0], move_location[1])
 
 			else:
@@ -269,6 +338,13 @@ class ChessBoardComponent():
 		up = 259
 		down = 258
 		q = 113
+		f4 = 268
+
+		#enter=10
+		#f1=265
+		#f2=266
+		#f3=267
+		#f4=268
 
 		self.window.move(origin[0], origin[1])
 		#self.window.move(0, 0)
@@ -282,7 +358,8 @@ class ChessBoardComponent():
 		while cursor_direction != 113:
 			cursor_direction = self.window.getch()
 
-
+			#self.stdscr.addstr(4,1,str(cursor_direction))
+			#self.stdscr.refresh()
 			if cursor_direction == left:
 				move_location[0] = cur_loc[0]
 				move_location[1] = cur_loc[1] - 5
@@ -299,6 +376,9 @@ class ChessBoardComponent():
 				move_location[0] = cur_loc[0] + 2
 				move_location[1] = cur_loc[1]
 				cur_loc = check_move_in_limit(move_location, cur_loc)
+			elif cursor_direction == f4:
+				#self.debug_menu.update_menu_display()
+				self.debug_menu.display_menu_window()
 			elif cursor_direction == q:
 				break
 
@@ -318,9 +398,10 @@ def draw_screen(stdscr):
 	stdscr.addstr(1,2,"F8(Game_Menu)")
 	stdscr.refresh()
 
-	chess_board_comp = ChessBoardComponent(board_one,10,10)
+	debug_menu = DebugMenuComponent(1,30)
+	chess_board_comp = ChessBoardComponent(board_one,10,10,debug_menu)
 	chess_board_comp.refresh()
-	chess_board_comp_two = ChessBoardComponent(board_two,50,50)
+	chess_board_comp_two = ChessBoardComponent(board_two,50,50,debug_menu)
 	chess_board_comp_two.refresh()
 	chess_board_comp.move_cb_cursor()
 	chess_board_comp_two.move_cb_cursor()
