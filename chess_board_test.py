@@ -216,7 +216,7 @@ class Board():
 	
 			else:#NON-Pawn Piece moving to EMPTY location
 				just_move(x, y)
-				increment_turn()
+				self.increment_turn()
 				self.reset_en_pessant()
 
 	#NEEDS_TESTING + INTEGRATION
